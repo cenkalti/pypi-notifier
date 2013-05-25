@@ -19,13 +19,14 @@ def register_views(app):
 
     @app.route('/repos', methods=['POST'])
     def post_repos():
-        for github_id, checked in request.form.iteritems():
+        for name, github_id in request.form.iteritems():
             github_id = int(github_id)
             repo = Repo.query.filter(
                 Repo.github_id == github_id,
                 Repo.user_id == g.user.id).first()
             if repo is None:
                 repo = Repo(github_id, g.user.id)
+            repo.name = name
             db.session.add(repo)
         db.session.commit()
         return redirect(url_for('thanks'))
