@@ -23,7 +23,7 @@ class User(db.Model):
     def __init__(self, github_token):
         self.github_token = github_token
 
-    def update_user_from_github(self):
+    def update_from_github(self):
         r = current_app.github.get_resource('user')
         r = json.loads(r[1])
         self.name = r['login']

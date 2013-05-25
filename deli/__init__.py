@@ -53,7 +53,7 @@ class Deli(Flask):
             user.github_token = token
             session['user_id'] = user.id
             set_user()
-            g.user.update_user_from_github()
+            g.user.update_from_github()
             db.session.commit()
             return redirect(next_url)
 

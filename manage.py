@@ -35,17 +35,29 @@ def find_latest(name):
 
 @manager.command
 def iter_users():
-    pass
+    from deli.models import db, User
+    for user in User.query.all():
+        user.update_from_github()
+        db.session.add(user)
+    db.session.commit()
 
 
 @manager.command
 def iter_repos():
-    pass
+    from deli.models import db, Repo
+    for repo in Repo.query.all():
+        repo.update_from_github()
+        db.session.add(repo)
+    db.session.commit()
 
 
 @manager.command
 def iter_packages():
-    pass
+    from deli.models import db, Package
+    for package in Package.query.all():
+        package.update_from_pypi()
+        db.session.add(package)
+    db.session.commit()
 
 
 @manager.command
