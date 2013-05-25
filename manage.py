@@ -1,5 +1,8 @@
 #!/usr/bin/env python
-from flask import g
+import os
+import errno
+
+from flask import g, current_app
 from flask.ext.script import Manager
  
 from deli import create_app
@@ -7,13 +10,24 @@ from deli import create_app
 manager = Manager(create_app)
 
 # Must be a class name from config.py
-manager.add_option('-c', '--config', dest='config', required=False)
+config = os.environ['DELI_CONFIG']
+manager.add_option('-c', '--config', dest='config', required=False,
+                   default=config)
 
 
 @manager.command
 def init_db():
     from deli.models import db
     db.create_all()
+
+
+@manager.command
+def drop_db():
+    try:
+        os.unlink('/tmp/deli.db')
+    except OSError as e:
+        if e.errno != errno.ENOENT:
+            raise
 
 
 @manager.command
