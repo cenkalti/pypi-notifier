@@ -3,10 +3,10 @@ from flask import (Flask, g, session, request, url_for, redirect, flash,
                    render_template)
 from flask.ext.github import GithubAuth
 
+import views
 import tasks
 from models import db, User
 from config import DevelopmentConfig
-from frontend import frontend
 
 
 class Deli(Flask):
@@ -39,7 +39,7 @@ class Deli(Flask):
         @self.route('/github-callback')
         @self.github.authorized_handler
         def oauth_authorized(resp):
-            next_url = request.args.get('next') or url_for('frontend.repos')
+            next_url = request.args.get('next') or url_for('repos')
 
             if resp is None:
                 flash(u'You denied the request to sign in.')
@@ -80,5 +80,5 @@ class Deli(Flask):
 def create_app(config_object):
     app = Deli(__name__, config_object)
     db.init_app(app)
-    app.register_blueprint(frontend)
+    views.register_views(app)
     return app
