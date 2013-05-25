@@ -1,0 +1,17 @@
+{% extends "layout.html" %}
+
+{% block body %}
+  {% if g.user %}
+    Hello {{ g.user.name }}
+
+    <nav>
+      <ul>
+        <li><a href={{ url_for('frontend.repos') }}>Repos</a></li>
+        <li><a href={{ url_for('logout') }}>Logout</a></li>
+      </ul>
+    </nav>
+
+  {% else %}
+    <a href={{ url_for('login') }}>Login with you GitHub account</a>
+  {% endif %}
+{% endblock %}

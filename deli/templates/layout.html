@@ -1,0 +1,7 @@
+<!doctype html>
+<title>{% block title %}Welcome{% endblock %} | Deli</title>
+<h1>Welcome</h1>
+{% for message in get_flashed_messages() %}
+  <p class=message>{{ message }}
+{% endfor %}
+{% block body %}{% endblock %}

@@ -1,0 +1,10 @@
+{% extends "layout.html" %}
+
+{% block body %}
+  Select repository
+  <ul>
+    {% for repo in repos %}
+      <li><a href={{ url_for('frontend.repo', name=repo) }}>{{repo}}</a></li>
+    {% endfor %}
+  </ul>
+{% endblock %}
