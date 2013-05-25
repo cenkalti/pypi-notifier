@@ -4,6 +4,8 @@ from flask.ext.script import Manager
 from deli import create_app
 
 manager = Manager(create_app)
+
+# Must be a class name from config.py
 manager.add_option('-c', '--config', dest='config', required=False)
 
 
@@ -29,6 +31,26 @@ def clear_cache():
 def find_latest(name):
     from deli.models import Package
     print Package(name).find_latest_version()
+
+
+@manager.command
+def iter_users():
+    pass
+
+
+@manager.command
+def iter_repos():
+    pass
+
+
+@manager.command
+def iter_packages():
+    pass
+
+
+@manager.command
+def iter_requirements():
+    pass
 
 
 if __name__ == '__main__':
