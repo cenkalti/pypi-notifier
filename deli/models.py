@@ -1,4 +1,10 @@
+import json
+import xmlrpclib
+
+from flask import current_app
 from flask.ext.sqlalchemy import SQLAlchemy
+
+from cache import cache
 
 db = SQLAlchemy()
 
@@ -16,6 +22,12 @@ class User(db.Model):
 
     def __init__(self, github_token):
         self.github_token = github_token
+
+    def update_user_from_github(self):
+        r = current_app.github.get_resource('user')
+        r = json.loads(r[1])
+        self.name = r['login']
+        self.github_id = r['id']
 
 
 class Repo(db.Model):
@@ -46,8 +58,24 @@ class Package(db.Model):
     updated_at = db.Column(db.DateTime)
     last_check = db.Column(db.DateTime)
 
+    pypi = xmlrpclib.ServerProxy('http://pypi.python.org/pypi')
+
     def __init__(self, name):
         self.name = name
+
+    @classmethod
+    @cache.cached(timeout=3600, key_prefix='all_packages')
+    def get_all_names(cls):
+        packages = cls.pypi.list_packages()
+        packages = filter(None, packages)
+        return {name.lower(): name for name in packages}
+
+    @property
+    def original_name(self):
+        return self.get_all_names()[self.name.lower()]
+
+    def find_latest_version(self):
+        return self.pypi.package_releases(self.original_name)[0]
 
 
 requirements = db.Table(

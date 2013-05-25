@@ -1,3 +1,5 @@
 flask
-flask-sqlalchemy
 flask-github
+flask-sqlalchemy
+flask-script
+flask-cache

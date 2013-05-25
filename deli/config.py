@@ -1,6 +1,8 @@
 class BaseConfig(object):
     SECRET_KEY = 'Seninle kim kalacak, isiklar kapaninca?'
     SQLALCHEMY_DATABASE_URI = 'sqlite:////tmp/deli.db'
+    CACHE_TYPE = 'filesystem'
+    CACHE_DIR = '/tmp'
 
 
 class DevelopmentConfig(BaseConfig):

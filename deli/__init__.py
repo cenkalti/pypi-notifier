@@ -3,17 +3,17 @@ from flask import (Flask, g, session, request, url_for, redirect, flash,
                    render_template)
 from flask.ext.github import GithubAuth
 
-import views
-import tasks
+import deli.config
+from cache import cache
+from views import register_views
 from models import db, User
-from config import DevelopmentConfig
 
 
 class Deli(Flask):
 
-    def __init__(self, import_name, config_object):
+    def __init__(self, import_name, config):
         super(Deli, self).__init__(import_name)
-        self.config.from_object(config_object)
+        self.load_config(config)
         self.github = GithubAuth(
             client_id=self.config['GITHUB_CLIENT_ID'],
             client_secret=self.config['GITHUB_CLIENT_SECRET'],
@@ -51,11 +51,10 @@ class Deli(Flask):
                 user = User(token)
                 db.session.add(user)
             user.github_token = token
-            db.session.commit()
-
             session['user_id'] = user.id
             set_user()
-            tasks.update_user(user)
+            g.user.update_user_from_github()
+            db.session.commit()
             return redirect(next_url)
 
         @self.route('/')
@@ -76,9 +75,15 @@ class Deli(Flask):
             session.pop('user_id', None)
             return redirect(url_for('index'))
 
+    def load_config(self, config):
+        if isinstance(config, basestring):
+            config = getattr(deli.config, config)
+        self.config.from_object(config)
 
-def create_app(config_object):
-    app = Deli(__name__, config_object)
+
+def create_app(config):
+    app = Deli(__name__, config)
     db.init_app(app)
-    views.register_views(app)
+    cache.init_app(app)
+    register_views(app)
     return app
