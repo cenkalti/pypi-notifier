@@ -8,8 +8,9 @@ class User(db.Model):
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(200))
+    name = db.Column(db.String(200))
     email = db.Column(db.String(200))
+    github_id = db.Column(db.Integer)
     github_token = db.Column(db.Integer)
 
     def __init__(self, github_token):

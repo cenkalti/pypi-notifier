@@ -3,6 +3,7 @@ from flask import (Flask, g, session, request, url_for, redirect, flash,
                    render_template)
 from flask.ext.github import GithubAuth
 
+import tasks
 from models import db, User
 from config import DevelopmentConfig
 from frontend import frontend
@@ -16,8 +17,7 @@ class Deli(Flask):
         self.github = GithubAuth(
             client_id=self.config['GITHUB_CLIENT_ID'],
             client_secret=self.config['GITHUB_CLIENT_SECRET'],
-            session_key='user_id'
-        )
+            session_key='user_id')
 
         @self.before_request
         def set_user():
@@ -30,7 +30,7 @@ class Deli(Flask):
             db.session.remove()
             return response
 
-        @self.github.authorized_handler
+        @self.github.access_token_getter
         def get_github_token():
             user = g.user
             if user is not None:
@@ -54,6 +54,8 @@ class Deli(Flask):
             db.session.commit()
 
             session['user_id'] = user.id
+            set_user()
+            tasks.update_user(user)
             return redirect(next_url)
 
         @self.route('/')
