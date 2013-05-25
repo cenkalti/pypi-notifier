@@ -22,7 +22,7 @@ class Deli(Flask):
         @self.before_request
         def set_user():
             g.user = None
-            if 'user_id' in session:
+            if session.get('user_id', None):
                 g.user = User.query.get(session['user_id'])
 
         @self.after_request
@@ -51,9 +51,10 @@ class Deli(Flask):
                 user = User(token)
                 db.session.add(user)
             user.github_token = token
+            db.session.commit()
             session['user_id'] = user.id
             set_user()
-            g.user.update_from_github()
+            user.update_from_github()
             db.session.commit()
             return redirect(next_url)
 
