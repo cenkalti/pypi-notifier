@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from flask import g
 from flask.ext.script import Manager
  
 from deli import create_app
@@ -37,6 +38,7 @@ def find_latest(name):
 def iter_users():
     from deli.models import db, User
     for user in User.query.all():
+        g.user = user
         user.update_from_github()
         db.session.add(user)
     db.session.commit()
@@ -46,6 +48,7 @@ def iter_users():
 def iter_repos():
     from deli.models import db, Repo
     for repo in Repo.query.all():
+        g.user = repo.user
         repo.update_from_github()
         db.session.add(repo)
     db.session.commit()
