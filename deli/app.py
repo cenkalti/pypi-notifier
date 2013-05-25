@@ -39,7 +39,7 @@ class Deli(Flask):
         @self.route('/github-callback')
         @self.github.authorized_handler
         def oauth_authorized(resp):
-            next_url = request.args.get('next') or url_for('index')
+            next_url = request.args.get('next') or url_for('frontend.repos')
 
             if resp is None:
                 flash(u'You denied the request to sign in.')

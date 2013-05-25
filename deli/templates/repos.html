@@ -3,9 +3,15 @@
 {% block body %}
   Select the repositories that you want to be notified when a requirement is
   updated.
-  <ul>
-    {% for repo in repos %}
-      <li><a href={{ url_for('frontend.repo', name=repo) }}>{{repo}}</a></li>
-    {% endfor %}
-  </ul>
+  <form method=post>
+    <ul>
+      {% for repo in repos %}
+        <li>
+          <input type="checkbox" name="{{ repo.id }}">
+          {{ repo.full_name }}
+        </li>
+      {% endfor %}
+    </ul>
+    <button type="submit">Next</button>
+  </form>
 {% endblock %}
