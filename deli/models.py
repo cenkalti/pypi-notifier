@@ -3,6 +3,7 @@ import xmlrpclib
 from pkg_resources import parse_requirements
 
 from flask.ext.sqlalchemy import SQLAlchemy
+from sqlalchemy.ext.associationproxy import association_proxy
 
 from cache import cache
 from github import github
@@ -24,6 +25,12 @@ class User(db.Model):
     def __init__(self, github_token):
         self.github_token = github_token
 
+    def __str__(self):
+        return self.name
+
+    def __repr__(self):
+        return "User(%r)" % self.github_token
+
     def update_from_github(self):
         user = github.get('user')
         self.name = user['login']
@@ -40,12 +47,17 @@ class Repo(db.Model):
     last_check = db.Column(db.DateTime)
     last_modified = db.Column(db.String(40))
 
-    requirements = db.relationship('Package', secondary='requirements',
-                                   backref='repos')
+    packages = association_proxy('requirements', 'package')
 
     def __init__(self, github_id, user_id):
         self.github_id = github_id
         self.user_id = user_id
+
+    def __str__(self):
+        return self.name
+
+    def __repr__(self):
+        return "Repo(%r, %r)" % (self.github_id, self.user_id)
 
     @staticmethod
     def find_version(requirement):
@@ -54,11 +66,23 @@ class Repo(db.Model):
                 return version
 
     def update_requirements(self):
-        requirements = self.fetch_changed_requirements()
-        if requirements:
-            requirements = parse_requirements(requirements)
+        for poject_name, version in self.parse_changed_requirements():
+            self.add_new_project(poject_name, version)
+
+    def add_new_project(self, name, version):
+        package = Package.get_or_create(name)
+        requirement = Requirement.get_or_create(self, package, version)
+        requirement.version = version
+        self.requirements.append = requirement
+
+    def parse_changed_requirements(self):
+        contents = self.fetch_changed_requirements()
+        if contents:
+            requirements = parse_requirements(contents)
             for each in requirements:
-                print each.project_name, Repo.find_version(each)
+                name = each.project_name.lower()
+                version = Repo.find_version(each)
+                yield name, version
 
     def fetch_changed_requirements(self):
         path = 'repos/%s/contents/requirements.txt' % self.name
@@ -87,7 +111,17 @@ class Package(db.Model):
     pypi = xmlrpclib.ServerProxy('http://pypi.python.org/pypi')
 
     def __init__(self, name):
-        self.name = name
+        self.name = name.lower()
+
+    def __str__(self):
+        return self.name
+
+    def __repr__(self):
+        return "Package(%r)" % self.name
+
+    @classmethod
+    def get_or_create(cls, name):
+        return cls.query.filter(cls.name == name).first() or cls(name)
 
     @classmethod
     @cache.cached(timeout=3600, key_prefix='all_packages')
@@ -104,9 +138,44 @@ class Package(db.Model):
         return self.pypi.package_releases(self.original_name)[0]
 
 
-requirements = db.Table(
-    'requirements',
-    db.Column('repo_id', db.Integer, db.ForeignKey(Repo.id)),
-    db.Column('package_id', db.Integer, db.ForeignKey(Package.id)),
-    db.Column('required_version', db.String(20)),
-)
+class Requirement(db.Model):
+    __tablename__ = 'requirements'
+
+    repo_id = db.Column(db.Integer, db.ForeignKey(Repo.id),
+                        primary_key=True)
+    package_id = db.Column(db.Integer, db.ForeignKey(Package.id),
+                           primary_key=True)
+    version = db.Column(db.String(20))
+
+    # bidirectional attribute/collection of "repo"/"repo_requirements"
+    repo = db.relationship(
+        Repo,
+        backref=db.backref('requirements', cascade="all, delete-orphan")
+    )
+
+    # reference to the "Package" object
+    package = db.relationship('Package')
+
+    def __init__(self, repo, package, version):
+        self.repo = repo
+        self.package = package
+        self.version = version
+
+    def __str__(self):
+        return "<Requirement repo=%s package=%s version=%s>" % (
+            self.repo, self.package, self.version)
+
+    def __repr__(self):
+        return "Package(%r, %r, %r)" % (
+            self.repo, self.package, self.version)
+
+    @classmethod
+    def get_or_create(cls, repo, package, version):
+        req = cls.query.filter(
+            cls.repo_id == repo.id,
+            cls.package_id == package.id).first()
+        if req is None:
+            req = cls(repo, package, version)
+
+        req.version = version
+        return req
