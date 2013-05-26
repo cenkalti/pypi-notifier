@@ -1,4 +1,3 @@
-import json
 import xmlrpclib
 
 from flask import current_app
@@ -24,10 +23,9 @@ class User(db.Model):
         self.github_token = github_token
 
     def update_from_github(self):
-        r = current_app.github.get_resource('user')
-        r = json.loads(r[1])
-        self.name = r['login']
-        self.github_id = r['id']
+        r, user = current_app.github.get_resource('user')
+        self.name = user['login']
+        self.email = user['email']
 
 
 class Repo(db.Model):

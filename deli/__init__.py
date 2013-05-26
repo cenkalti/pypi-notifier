@@ -46,16 +46,22 @@ class Deli(Flask):
                 return redirect(next_url)
 
             token = resp['access_token']
+            user_response = self.github.get_resource(
+                'user', access_token=token)[1]
+            github_id = user_response['id']
             user = User.query.filter_by(github_token=token).first()
+            if user is None:
+                user = User.query.filter_by(github_id=github_id).first()
             if user is None:
                 user = User(token)
                 db.session.add(user)
+
             user.github_token = token
+            user.github_id = github_id
+            user.name = user_response['login']
+            user.email = user_response['email']
             db.session.commit()
             session['user_id'] = user.id
-            set_user()
-            user.update_from_github()
-            db.session.commit()
             return redirect(next_url)
 
         @self.route('/')
@@ -67,7 +73,7 @@ class Deli(Flask):
             if session.get('user_id', None) is None or g.user is None:
                 return self.github.authorize(
                     callback_url=self.config['CALLBACK_URL'],
-                    scope='user:email')
+                    scope='user:email, public_repo')
             else:
                 return redirect(url_for('index'))
 

@@ -1,5 +1,3 @@
-import json
-
 from flask import render_template, request, current_app, redirect, url_for, g
 
 from models import db, Repo
@@ -13,8 +11,10 @@ def register_views(app):
 
     @app.route('/repos')
     def repos():
-        content = current_app.github.get_resource('user/repos')
-        repos = json.loads(content[1])
+        r, repos = current_app.github.get_resource('user/repos')
+        selected_ids = [r.github_id for r in g.user.repos]
+        for repo in repos:
+            repo['checked'] = (repo['id'] in selected_ids)
         return render_template('repos.html', repos=repos)
 
     @app.route('/repos', methods=['POST'])
@@ -44,8 +44,3 @@ def register_views(app):
         <input type=text value=requirements.txt>
         <input type=submit>
         </form>"""
-
-    @app.route('/content')
-    def content():
-        return current_app.github.get_resource(
-            'repos/cenkalti/kuyruk/contents/setup.py')[1]

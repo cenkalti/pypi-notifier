@@ -7,7 +7,7 @@
     <ul>
       {% for repo in repos %}
         <li>
-          <input type="checkbox"
+          <input type="checkbox", {{ "checked" if repo.checked else "" }}
                  name="{{ repo.full_name }}" value="{{ repo.id }}">
           {{ repo.full_name }}
         </li>
