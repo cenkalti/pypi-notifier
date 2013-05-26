@@ -147,14 +147,10 @@ class Requirement(db.Model):
                            primary_key=True)
     version = db.Column(db.String(20))
 
-    # bidirectional attribute/collection of "repo"/"repo_requirements"
+    package = db.relationship('Package')
     repo = db.relationship(
         Repo,
-        backref=db.backref('requirements', cascade="all, delete-orphan")
-    )
-
-    # reference to the "Package" object
-    package = db.relationship('Package')
+        backref=db.backref('requirements', cascade="all, delete-orphan"))
 
     def __init__(self, repo, package, version):
         self.repo = repo
