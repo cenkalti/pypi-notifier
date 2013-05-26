@@ -63,7 +63,7 @@ def iter_repos():
     from deli.models import db, Repo
     for repo in Repo.query.all():
         g.user = repo.user
-        repo.update_from_github()
+        repo.update_requirements()
         db.session.add(repo)
     db.session.commit()
 

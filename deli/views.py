@@ -1,17 +1,18 @@
-from flask import render_template, request, current_app, redirect, url_for, g
+from flask import render_template, request, redirect, url_for, g
 
 from models import db, Repo
+from github import github
 
 
 def register_views(app):
 
     @app.route('/user')
     def user():
-        return str(current_app.github.get_resource('user'))
+        return str(github.get('user'))
 
     @app.route('/repos')
     def repos():
-        r, repos = current_app.github.get_resource('user/repos')
+        repos = github.get('user/repos')
         selected_ids = [r.github_id for r in g.user.repos]
         for repo in repos:
             repo['checked'] = (repo['id'] in selected_ids)
