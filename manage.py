@@ -2,11 +2,12 @@
 import os
 import errno
 
-from flask import g
-from flask.ext.script import Manager
+from flask import g, current_app
+from flask.ext.script import Manager, Shell
 from flask.ext.github import GitHubError
  
-from deli import create_app
+from deli import create_app, db
+from deli import models
 
 manager = Manager(create_app)
 
@@ -14,6 +15,11 @@ manager = Manager(create_app)
 config = os.environ['DELI_CONFIG']
 manager.add_option('-c', '--config', dest='config', required=False,
                    default=config)
+
+
+def _make_context():
+    return dict(app=current_app, db=db, models=models)
+manager.add_command("shell", Shell(make_context=_make_context))
 
 
 @manager.command
