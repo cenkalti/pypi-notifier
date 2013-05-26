@@ -2,8 +2,9 @@
 import os
 import errno
 
-from flask import g, current_app
+from flask import g
 from flask.ext.script import Manager
+from flask.ext.github import GitHubError
  
 from deli import create_app
 
@@ -63,8 +64,11 @@ def iter_repos():
     from deli.models import db, Repo
     for repo in Repo.query.all():
         g.user = repo.user
-        repo.update_requirements()
-        db.session.add(repo)
+        try:
+            repo.update_requirements()
+            db.session.add(repo)
+        except GitHubError as e:
+            print e
     db.session.commit()
 
 

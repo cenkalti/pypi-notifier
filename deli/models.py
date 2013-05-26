@@ -1,9 +1,11 @@
+import base64
 import xmlrpclib
+from pkg_resources import parse_requirements
 
-from flask import current_app
 from flask.ext.sqlalchemy import SQLAlchemy
 
 from cache import cache
+from github import github
 
 db = SQLAlchemy()
 
@@ -23,7 +25,7 @@ class User(db.Model):
         self.github_token = github_token
 
     def update_from_github(self):
-        r, user = current_app.github.get_resource('user')
+        user = github.get('user')
         self.name = user['login']
         self.email = user['email']
 
@@ -36,8 +38,7 @@ class Repo(db.Model):
     github_id = db.Column(db.Integer, unique=True)
     name = db.Column(db.String(200))
     last_check = db.Column(db.DateTime)
-    # last_hash = db.Column()
-    # last_etag = db.Column()
+    last_modified = db.Column(db.String(40))
 
     requirements = db.relationship('Package', secondary='requirements',
                                    backref='repos')
@@ -45,6 +46,33 @@ class Repo(db.Model):
     def __init__(self, github_id, user_id):
         self.github_id = github_id
         self.user_id = user_id
+
+    @staticmethod
+    def find_version(requirement):
+        for specifier, version in requirement.specs:
+            if specifier in ('==', '>='):
+                return version
+
+    def update_requirements(self):
+        requirements = self.fetch_changed_requirements()
+        if requirements:
+            requirements = parse_requirements(requirements)
+            for each in requirements:
+                print each.project_name, Repo.find_version(each)
+
+    def fetch_changed_requirements(self):
+        path = 'repos/%s/contents/requirements.txt' % self.name
+        headers = {}
+        # if self.last_modified:
+        #     headers['If-Modified-Since'] = self.last_modified
+        response = github.raw_request('GET', path, headers=headers)
+        if response.status_code == 200:
+            self.last_modified = response.headers['Last-Modified']
+            response = response.json()
+            if response['encoding'] == 'base64':
+                return base64.b64decode(response['content'])
+            else:
+                raise Exception("Unknown encoding: %s" % response['encoding'])
 
 
 class Package(db.Model):
