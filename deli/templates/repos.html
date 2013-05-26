@@ -4,7 +4,7 @@
   Select the repositories that you want to be notified when a requirement is
   updated.
   <form method=post>
-    <ul>
+    <ul style="list-style: none">
       {% for repo in repos %}
         <li>
           <input type="checkbox", {{ "checked" if repo.checked else "" }}
