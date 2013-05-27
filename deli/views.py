@@ -27,7 +27,7 @@ def register_views(app):
                 Repo.github_id == github_id,
                 Repo.user_id == g.user.id).first()
             if repo is None:
-                repo = Repo(github_id, g.user.id)
+                repo = Repo(github_id, g.user)
             repo.name = name
             db.session.add(repo)
 

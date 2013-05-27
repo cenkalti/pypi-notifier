@@ -49,15 +49,15 @@ class Repo(db.Model):
 
     packages = association_proxy('requirements', 'package')
 
-    def __init__(self, github_id, user_id):
+    def __init__(self, github_id, user):
         self.github_id = github_id
-        self.user_id = user_id
+        self.user = user
 
     def __str__(self):
         return self.name
 
     def __repr__(self):
-        return "Repo(%r, %r)" % (self.github_id, self.user_id)
+        return "Repo(%r, %r)" % (self.github_id, self.user)
 
     @staticmethod
     def find_version(requirement):
@@ -147,7 +147,9 @@ class Requirement(db.Model):
                            primary_key=True)
     version = db.Column(db.String(20))
 
-    package = db.relationship('Package')
+    package = db.relationship(
+        Package,
+        backref=db.backref('repos', cascade='all, delete-orphan'))
     repo = db.relationship(
         Repo,
         backref=db.backref('requirements', cascade="all, delete-orphan"))
