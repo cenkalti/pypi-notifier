@@ -17,9 +17,9 @@ manager.add_option('-c', '--config', dest='config', required=False,
                    default=config)
 
 
-def _make_context():
+@manager.shell
+def make_shell_context():
     return dict(app=current_app, db=db, models=models)
-manager.add_command("shell", Shell(make_context=_make_context))
 
 
 @manager.command
