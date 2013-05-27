@@ -3,11 +3,12 @@ import os
 import errno
 
 from flask import g, current_app
-from flask.ext.script import Manager, Shell
-from flask.ext.github import GitHubError
- 
-from deli import create_app, db
+from flask.ext.script import Manager
+
+from deli import create_app
 from deli import models
+from deli.cache import cache
+from deli.models import db, User, Repo, Requirement, Package
 
 manager = Manager(create_app)
 
@@ -24,7 +25,6 @@ def make_shell_context():
 
 @manager.command
 def init_db():
-    from deli.models import db
     db.create_all()
 
 
@@ -39,57 +39,47 @@ def drop_db():
 
 @manager.command
 def fetch_package_list():
-    from deli.models import Package
     Package.get_all_names()
 
 
 @manager.command
 def clear_cache():
-    from deli.cache import cache
     cache.clear()
 
 
 @manager.command
 def find_latest(name):
-    from deli.models import Package
     print Package(name).find_latest_version()
 
 
 @manager.command
 def iter_users():
-    from deli.models import db, User
     for user in User.query.all():
         g.user = user
         user.update_from_github()
-        db.session.add(user)
     db.session.commit()
 
 
 @manager.command
 def iter_repos():
-    from deli.models import db, Repo
     for repo in Repo.query.all():
         g.user = repo.user
-        try:
-            repo.update_requirements()
-            db.session.add(repo)
-        except GitHubError as e:
-            print e
+        repo.update_requirements()
     db.session.commit()
 
 
 @manager.command
 def iter_packages():
-    from deli.models import db, Package
     for package in Package.query.all():
         package.update_from_pypi()
-        db.session.add(package)
     db.session.commit()
 
 
 @manager.command
 def iter_requirements():
-    pass
+    for requirement in Requirement.query.all():
+        requirement.check_for_update()
+    db.session.commit()
 
 
 if __name__ == '__main__':

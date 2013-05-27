@@ -1,5 +1,6 @@
 import base64
 import xmlrpclib
+from datetime import datetime
 from pkg_resources import parse_requirements
 
 from flask.ext.sqlalchemy import SQLAlchemy
@@ -138,6 +139,13 @@ class Package(db.Model):
 
     def find_latest_version(self):
         return self.pypi.package_releases(self.original_name)[0]
+
+    def update_from_pypi(self):
+        latest = self.find_latest_version()
+        self.last_check = datetime.utcnow()
+        if self.latest_version != latest:
+            self.latest_version = latest
+            self.updated_at = datetime.utcnow()
 
 
 class Requirement(db.Model):
