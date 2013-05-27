@@ -82,13 +82,15 @@ class Repo(db.Model):
             for each in requirements:
                 name = each.project_name.lower()
                 version = Repo.find_version(each)
-                yield name, version
+                if version:
+                    yield name, version
 
     def fetch_changed_requirements(self):
+        headers = {'If-Modified-Since': self.last_modified}
+        return self.fetch_requirements(headers)
+
+    def fetch_requirements(self, headers=None):
         path = 'repos/%s/contents/requirements.txt' % self.name
-        headers = {}
-        # if self.last_modified:
-        #     headers['If-Modified-Since'] = self.last_modified
         response = github.raw_request('GET', path, headers=headers)
         if response.status_code == 200:
             self.last_modified = response.headers['Last-Modified']
