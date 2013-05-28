@@ -1,5 +1,11 @@
 Flask==0.9
 Flask-Cache==0.12
--e git+git@github.com:cenkalti/flask-github.git#egg=Flask_Github-dev
+-e git+git@github.com:cenkalti/flask-github.git@7d067ae206865fd68c42631e49eb91c750f48adc#egg=Flask_Github-dev
 Flask-SQLAlchemy==0.16
 Flask-Script==0.5.3
+Jinja2==2.7
+MarkupSafe==0.18
+SQLAlchemy==0.8.1
+Werkzeug==0.8.3
+requests==1.2.3
+wsgiref==0.1.2
