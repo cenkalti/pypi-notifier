@@ -1,5 +1,5 @@
-flask
-flask-github
-flask-sqlalchemy
-flask-script
-flask-cache
+Flask==0.9
+Flask-Cache==0.12
+-e git+git@github.com:cenkalti/flask-github.git#egg=Flask_Github-dev
+Flask-SQLAlchemy==0.16
+Flask-Script==0.5.3
