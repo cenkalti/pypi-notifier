@@ -11,8 +11,8 @@ github = GitHub()
 
 
 def create_app(config):
-    from deli.views import register_views
-    from deli.models import db, User
+    from pypi_notifier.views import register_views
+    from pypi_notifier.models import db, User
 
     app = Flask(__name__)
     load_config(app, config)
@@ -85,7 +85,7 @@ def create_app(config):
 
 
 def load_config(app, object_or_str):
-    from deli import config
+    from pypi_notifier import config
     if isinstance(object_or_str, basestring):
         object_or_str = getattr(config, object_or_str)
     app.config.from_object(object_or_str)

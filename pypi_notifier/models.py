@@ -5,7 +5,7 @@ from pkg_resources import parse_requirements
 
 from sqlalchemy.ext.associationproxy import association_proxy
 
-from deli import db, cache, github
+from pypi_notifier import db, cache, github
 
 
 class User(db.Model):

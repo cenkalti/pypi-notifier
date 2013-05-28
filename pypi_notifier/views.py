@@ -1,7 +1,7 @@
 from flask import render_template, request, redirect, url_for, g
 
-from deli import db, github
-from deli.models import Repo
+from pypi_notifier import db, github
+from pypi_notifier.models import Repo
 
 
 def register_views(app):

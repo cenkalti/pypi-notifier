@@ -5,13 +5,13 @@ import errno
 from flask import g, current_app
 from flask.ext.script import Manager
 
-from deli import create_app, db, models, cache
-from deli.models import User, Repo, Requirement, Package
+from pypi_notifier import create_app, db, models, cache
+from pypi_notifier.models import User, Repo, Requirement, Package
 
 manager = Manager(create_app)
 
 # Must be a class name from config.py
-config = os.environ['DELI_CONFIG']
+config = os.environ['PYPI_NOTIFIER_CONFIG']
 manager.add_option('-c', '--config', dest='config', required=False,
                    default=config)
 
@@ -29,7 +29,7 @@ def init_db():
 @manager.command
 def drop_db():
     try:
-        os.unlink('/tmp/deli.db')
+        os.unlink('/tmp/pypi_notifier.db')
     except OSError as e:
         if e.errno != errno.ENOENT:
             raise
