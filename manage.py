@@ -5,10 +5,8 @@ import errno
 from flask import g, current_app
 from flask.ext.script import Manager
 
-from deli import create_app
-from deli import models
-from deli.cache import cache
-from deli.models import db, User, Repo, Requirement, Package
+from deli import create_app, db, models, cache
+from deli.models import User, Repo, Requirement, Package
 
 manager = Manager(create_app)
 

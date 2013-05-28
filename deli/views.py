@@ -1,7 +1,7 @@
 from flask import render_template, request, redirect, url_for, g
 
-from models import db, Repo
-from github import github
+from deli import db, github
+from deli.models import Repo
 
 
 def register_views(app):
@@ -43,13 +43,3 @@ def register_views(app):
     @app.route('/thanks')
     def thanks():
         return render_template('thanks.html')
-
-    @app.route('/repo/<path:name>', methods=['GET', 'POST'])
-    def repo(name):
-        if request.method == 'POST':
-            return 'yes'
-        return """Enter path of requirements.txt<br>
-        <form method=post>
-        <input type=text value=requirements.txt>
-        <input type=submit>
-        </form>"""

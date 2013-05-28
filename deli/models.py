@@ -3,13 +3,9 @@ import xmlrpclib
 from datetime import datetime
 from pkg_resources import parse_requirements
 
-from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy.ext.associationproxy import association_proxy
 
-from cache import cache
-from github import github
-
-db = SQLAlchemy()
+from deli import db, cache, github
 
 
 class User(db.Model):

@@ -1,14 +1,19 @@
 from flask import Flask
 from flask import g, session, request, url_for, redirect, flash, render_template
+from flask.ext.cache import Cache
+from flask.ext.github import GitHub
+from flask.ext.sqlalchemy import SQLAlchemy
 
-import deli.config
-from cache import cache
-from views import register_views
-from github import github
-from models import db, User
+
+db = SQLAlchemy()
+cache = Cache()
+github = GitHub()
 
 
 def create_app(config):
+    from deli.views import register_views
+    from deli.models import db, User
+
     app = Flask(__name__)
     load_config(app, config)
     db.init_app(app)
@@ -79,7 +84,8 @@ def create_app(config):
     return app
 
 
-def load_config(app, config):
-    if isinstance(config, basestring):
-        config = getattr(deli.config, config)
-    app.config.from_object(config)
+def load_config(app, object_or_str):
+    from deli import config
+    if isinstance(object_or_str, basestring):
+        object_or_str = getattr(config, object_or_str)
+    app.config.from_object(object_or_str)
