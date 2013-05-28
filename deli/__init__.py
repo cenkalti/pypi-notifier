@@ -1,5 +1,5 @@
-from flask import Flask
-from flask import g, session, request, url_for, redirect, flash, render_template
+from flask import Flask, g, session, request, url_for, redirect, flash, \
+    render_template
 from flask.ext.cache import Cache
 from flask.ext.github import GitHub
 from flask.ext.sqlalchemy import SQLAlchemy
