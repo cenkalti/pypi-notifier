@@ -1,2 +1,2 @@
 *.pyc
-deli/config.py
+pypi_notifier/config.py
