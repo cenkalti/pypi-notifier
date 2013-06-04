@@ -1,6 +1,6 @@
 Flask==0.9
 Flask-Cache==0.12
--e git+git@github.com:cenkalti/flask-github.git@7d067ae206865fd68c42631e49eb91c750f48adc#egg=Flask_Github-dev
+-e git+git@github.com:cenkalti/flask-github.git@1cab6ad5f52aa3403903da5c3cee5059774ab933#egg=Flask_Github-dev
 Flask-SQLAlchemy==0.16
 Flask-Script==0.5.3
 Jinja2==2.7
