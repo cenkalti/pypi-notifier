@@ -45,6 +45,8 @@ class Repo(db.Model):
         for poject_name, version in self.parse_requirements_file():
             self.add_new_project(poject_name, version)
 
+        self.last_check = datetime.utcnow()
+
     def add_new_project(self, name, version):
         from pypi_notifier.models.requirement import Requirement
         package = Package.get_or_create(name)
