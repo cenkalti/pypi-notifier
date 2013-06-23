@@ -1,12 +1,16 @@
 #!/usr/bin/env python
 import os
 import errno
+import logging
 
 from flask import g, current_app
 from flask.ext.script import Manager
 
 from pypi_notifier import create_app, db, models, cache
 from pypi_notifier.models import User, Repo, Requirement, Package
+
+
+logging.basicConfig(level=logging.DEBUG)
 
 manager = Manager(create_app)
 
