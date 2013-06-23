@@ -81,3 +81,7 @@ class Repo(db.Model):
                 return base64.b64decode(response['content'])
             else:
                 raise Exception("Unknown encoding: %s" % response['encoding'])
+        elif response.status_code == 304:
+            return None
+        else:
+            raise Exception("Unknown status code: %s", response.status_code)
