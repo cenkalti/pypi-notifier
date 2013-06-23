@@ -35,7 +35,7 @@ class Repo(db.Model):
                 return version
 
     def update_requirements(self):
-        for poject_name, version in self.parse_changed_requirements():
+        for poject_name, version in self.parse_requirements_file():
             self.add_new_project(poject_name, version)
 
     def add_new_project(self, name, version):
@@ -45,7 +45,7 @@ class Repo(db.Model):
         requirement.version = version
         self.requirements.append = requirement
 
-    def parse_changed_requirements(self):
+    def parse_requirements_file(self):
         contents = self.fetch_changed_requirements()
         if contents:
             requirements = parse_requirements(contents)
