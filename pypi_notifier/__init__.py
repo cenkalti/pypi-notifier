@@ -12,7 +12,7 @@ github = GitHub()
 
 def create_app(config):
     from pypi_notifier.views import register_views
-    from pypi_notifier.models import db, User
+    from pypi_notifier.models import User
 
     app = Flask(__name__)
     load_config(app, config)
