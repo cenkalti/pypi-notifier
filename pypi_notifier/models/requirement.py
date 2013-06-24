@@ -3,6 +3,7 @@ from pypi_notifier import db
 from pypi_notifier.models.repo import Repo
 from pypi_notifier.models.package import Package
 from pypi_notifier.models.mixin import ModelMixin
+from pypi_notifier.models.util import JSONType
 
 
 logger = logging.getLogger(__name__)
@@ -17,7 +18,7 @@ class Requirement(db.Model, ModelMixin):
     package_id = db.Column(db.Integer,
                            db.ForeignKey(Package.id),
                            primary_key=True)
-    specs = db.Column(db.PickleType())
+    specs = db.Column(JSONType())
 
     package = db.relationship(
         Package,
