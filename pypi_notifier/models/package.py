@@ -36,6 +36,10 @@ class Package(db.Model, ModelMixin):
         return self.pypi.package_releases(self.original_name)[0]
 
     def update_from_pypi(self):
+        """
+        Updates the latest version of the package by asking PyPI.
+
+        """
         latest = self.find_latest_version()
         self.last_check = datetime.utcnow()
         if self.latest_version != latest:
