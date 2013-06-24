@@ -19,6 +19,7 @@ class FlaskrTestCase(unittest.TestCase):
     def test_login(self):
         rv = self.client.get('/login')
         assert rv.status_code == 302
+        assert 'github.com' in rv.headers['Location']
 
 
 if __name__ == '__main__':
