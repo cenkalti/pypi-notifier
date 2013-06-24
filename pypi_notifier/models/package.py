@@ -1,9 +1,10 @@
 from datetime import datetime
 import xmlrpclib
 from pypi_notifier import db, cache
+from pypi_notifier.models.mixin import ModelMixin
 
 
-class Package(db.Model):
+class Package(db.Model, ModelMixin):
     __tablename__ = 'packages'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -17,15 +18,8 @@ class Package(db.Model):
     def __init__(self, name):
         self.name = name.lower()
 
-    def __str__(self):
-        return self.name
-
     def __repr__(self):
-        return "Package(%r)" % self.name
-
-    @classmethod
-    def get_or_create(cls, name):
-        return cls.query.filter(cls.name == name).first() or cls(name)
+        return "<Package %s>" % self.name
 
     @classmethod
     @cache.cached(timeout=3600, key_prefix='all_packages')

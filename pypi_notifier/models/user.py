@@ -1,7 +1,8 @@
 from pypi_notifier import db, github
+from pypi_notifier.models.mixin import ModelMixin
 
 
-class User(db.Model):
+class User(db.Model, ModelMixin):
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -15,11 +16,8 @@ class User(db.Model):
     def __init__(self, github_token):
         self.github_token = github_token
 
-    def __str__(self):
-        return self.name
-
     def __repr__(self):
-        return "User(%r)" % self.github_token
+        return "<User %s>" % self.name
 
     def update_from_github(self):
         user = github.get('user')

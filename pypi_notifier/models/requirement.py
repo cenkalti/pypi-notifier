@@ -1,16 +1,23 @@
+import logging
 from pypi_notifier import db
 from pypi_notifier.models.repo import Repo
 from pypi_notifier.models.package import Package
+from pypi_notifier.models.mixin import ModelMixin
 
 
-class Requirement(db.Model):
+logger = logging.getLogger(__name__)
+
+
+class Requirement(db.Model, ModelMixin):
     __tablename__ = 'requirements'
 
-    repo_id = db.Column(db.Integer, db.ForeignKey(Repo.id),
+    repo_id = db.Column(db.Integer,
+                        db.ForeignKey(Repo.id),
                         primary_key=True)
-    package_id = db.Column(db.Integer, db.ForeignKey(Package.id),
+    package_id = db.Column(db.Integer,
+                           db.ForeignKey(Package.id),
                            primary_key=True)
-    version = db.Column(db.String(20))
+    specs = db.Column(db.PickleType())
 
     package = db.relationship(
         Package,
@@ -19,26 +26,18 @@ class Requirement(db.Model):
         Repo,
         backref=db.backref('requirements', cascade="all, delete-orphan"))
 
-    def __init__(self, repo, package, version):
+    def __init__(self, repo, package, specs=None):
         self.repo = repo
         self.package = package
-        self.version = version
-
-    def __str__(self):
-        return "<Requirement repo=%s package=%s version=%s>" % (
-            self.repo, self.package, self.version)
+        self.specs = specs
 
     def __repr__(self):
-        return "Package(%r, %r, %r)" % (
-            self.repo, self.package, self.version)
+        return "<Requirement repo=%s package=%s>" % (self.repo, self.package)
 
-    @classmethod
-    def get_or_create(cls, repo, package, version):
-        req = cls.query.filter(
-            cls.repo_id == repo.id,
-            cls.package_id == package.id).first()
-        if req is None:
-            req = cls(repo, package, version)
-
-        req.version = version
-        return req
+    @property
+    def version(self):
+        logger.debug("Finding version of %s", self)
+        for specifier, version in self.specs:
+            logger.debug("specifier: %s, version: %s", specifier, version)
+            if specifier in ('==', '>='):
+                return version
