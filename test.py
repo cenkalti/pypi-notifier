@@ -16,6 +16,10 @@ class FlaskrTestCase(unittest.TestCase):
         rv = self.client.get('/')
         assert 'Login' in rv.data
 
+    def test_login(self):
+        rv = self.client.get('/login')
+        assert rv.status_code == 302
+
 
 if __name__ == '__main__':
     unittest.main()
