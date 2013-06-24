@@ -33,7 +33,8 @@ class Requirement(db.Model, ModelMixin):
         self.specs = specs
 
     def __repr__(self):
-        return "<Requirement repo=%s package=%s>" % (self.repo, self.package)
+        return "<Requirement: %s requires %s with %s>" % (
+            self.repo.name, self.package.name, self.specs)
 
     @property
     def version(self):

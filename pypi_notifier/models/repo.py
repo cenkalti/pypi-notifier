@@ -32,6 +32,11 @@ class Repo(db.Model, ModelMixin):
         return "<Repo %s>" % self.name
 
     def update_requirements(self):
+        """
+        Fetches the content of the requirements.txt files from GitHub,
+        parses the file and adds each requirement to the repo.
+
+        """
         for poject_name, specs in self.parse_requirements_file():
             self.add_new_requirement(poject_name, specs)
 
@@ -45,14 +50,12 @@ class Repo(db.Model, ModelMixin):
         self.requirements.append = requirement
 
     def parse_requirements_file(self):
-        contents = self.fetch_changed_requirements()
+        contents = self.fetch_requirements_if_modified()
         if contents:
-            requirements = parse_requirements(contents)
-            for each in requirements:
-                name = each.project_name.lower()
-                yield name, each.specs
+            for req in parse_requirements(contents):
+                yield req.project_name.lower(), req.specs
 
-    def fetch_changed_requirements(self):
+    def fetch_requirements_if_modified(self):
         headers = {'If-Modified-Since': self.last_modified}
         return self.fetch_requirements(headers)
 

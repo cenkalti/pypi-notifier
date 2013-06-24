@@ -20,6 +20,13 @@ class User(db.Model, ModelMixin):
         return "<User %s>" % self.name
 
     def update_from_github(self):
+        """
+        Updates the user's name and email by asking to GitHub.
+
+        Name and email of the user may be changed so we should update
+        these periodically.
+
+        """
         user = github.get('user')
         self.name = user['login']
         self.email = user['email']
