@@ -20,8 +20,10 @@ def create_app(config):
     db.init_app(app)
     cache.init_app(app)
     github.init_app(app)
-    Sentry(app)
     register_views(app)
+
+    if app.config.get('SENTRY_DSN'):
+        Sentry(app)
 
     @app.before_request
     def set_user():
