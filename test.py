@@ -78,6 +78,22 @@ class PyPINotifierTestCase(unittest.TestCase):
         assert Requirement.query.all() == [f['req1']]
         assert Package.query.all() == [f['p1'], f['p2']]
 
+    def test_update_requirements(self):
+        u = User('t')
+        r = Repo(2, u)
+        db.session.add(r)
+        db.session.commit()
+
+        with patch.object(Repo, 'fetch_requirements') as fetch_requirements:
+            fetch_requirements.return_value = "a==1.0\nb>=2.1"
+            r.update_requirements()
+            db.session.commit()
+
+        reqs = Requirement.query.all()
+        assert len(reqs) == 2
+        assert (reqs[0].package.name, reqs[0].required_version) == ('a', '1.0')
+        assert (reqs[1].package.name, reqs[1].required_version) == ('b', '2.1')
+
 
 if __name__ == '__main__':
     unittest.main()
