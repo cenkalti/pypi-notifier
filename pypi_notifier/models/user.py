@@ -1,5 +1,11 @@
+import logging
+from datetime import datetime, timedelta
+from sqlalchemy import or_
 from pypi_notifier import db, github
 from pypi_notifier.models.mixin import ModelMixin
+
+
+logger = logging.getLogger(__name__)
 
 
 class User(db.Model, ModelMixin):
@@ -32,3 +38,31 @@ class User(db.Model, ModelMixin):
         user = github.get('user')
         self.name = user['login']
         self.email = user['email']
+
+    def get_outdated_requirements(self):
+        outdateds = []
+        for repo in self.repos:
+            for req in repo.requirements:
+                if not req.up_to_date:
+                    logger.debug("%s is outdated", req)
+                    outdateds.append(req)
+
+        return outdateds
+
+    def send_email(self):
+        template = "%s"
+        print template % self.get_outdated_requirements()
+
+    @classmethod
+    def send_emails(cls):
+        users = cls.query.filter(
+            or_(
+                cls.email_sent_at <= datetime.utcnow() - timedelta(days=7),
+                cls.email_sent_at == None
+            )
+        ).all()
+        for user in users:
+            logger.info(user)
+            user.send_email()
+            user.email_sent_at = datetime.utcnow()
+            db.session.commit()

@@ -78,10 +78,8 @@ def iter_packages():
 
 
 @manager.command
-def iter_requirements():
-    for requirement in Requirement.query.all():
-        requirement.check_for_update()
-    db.session.commit()
+def send_emails():
+    models.User.send_emails()
 
 
 if __name__ == '__main__':
