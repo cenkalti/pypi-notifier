@@ -1,4 +1,5 @@
 import logging
+from verlib import NormalizedVersion as Version
 from pypi_notifier import db
 from pypi_notifier.models.repo import Repo
 from pypi_notifier.models.package import Package
@@ -37,9 +38,17 @@ class Requirement(db.Model, ModelMixin):
             self.repo.name, self.package.name, self.specs)
 
     @property
-    def version(self):
+    def required_version(self):
         logger.debug("Finding version of %s", self)
         for specifier, version in self.specs:
             logger.debug("specifier: %s, version: %s", specifier, version)
             if specifier in ('==', '>='):
                 return version
+
+    @property
+    def up_to_date(self):
+        latest_version = self.package.latest_version
+        if not latest_version:
+            raise Exception("Latest version of the package is unknown.")
+
+        return Version(self.required_version) == Version(latest_version)
