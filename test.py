@@ -4,7 +4,7 @@ from mock import patch
 from flask.ext.github import GitHub
 
 from pypi_notifier import create_app, db
-from pypi_notifier.models import User
+from pypi_notifier.models import User, Repo, Requirement, Package
 from pypi_notifier.config import TestingConfig
 
 
@@ -42,6 +42,48 @@ class PyPINotifierTestCase(unittest.TestCase):
         user = User.query.get(1)
         assert user
         assert user.github_token == 'asdf'
+
+    def fixture(self):
+        u1 = User('u1')
+        u2 = User('u2')
+        r1 = Repo('r1', u1)
+        r2 = Repo('r2', u2)
+        p1 = Package('p1')
+        p2 = Package('p2')
+        req1 = Requirement(r1, p1)
+        req2 = Requirement(r2, p1)
+        req3 = Requirement(r2, p2)
+        db.session.add(u1)
+        db.session.add(u2)
+        db.session.add(req1)
+        db.session.add(req2)
+        db.session.add(req3)
+        db.session.commit()
+        return locals()
+
+    def test_remove_user(self):
+        """Tests SQLAlchemy relationships.
+
+        When a User deletes his account all of the records should be deleted
+        except the Package which is also used by another User.
+
+        """
+        f = self.fixture()
+
+        db.session.delete(f['u2'])
+        db.session.commit()
+
+        assert User.query.all() == [f['u1']]
+        assert Repo.query.all() == [f['r1']]
+        assert Requirement.query.all() == [f['req1']]
+        assert Package.query.all() == [f['p1']], Package.query.all()
+
+    def test_remove_package(self):
+        """Do not allow removing of package that is in use."""
+        f = self.fixture()
+
+        db.session.delete(f['p1'])
+        self.assertRaises(Exception, db.session.commit)
 
 
 if __name__ == '__main__':
