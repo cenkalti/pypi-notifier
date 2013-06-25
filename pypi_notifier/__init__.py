@@ -3,6 +3,7 @@ from flask import Flask, g, session, request, url_for, redirect, flash, \
 from flask.ext.cache import Cache
 from flask.ext.github import GitHub
 from flask.ext.sqlalchemy import SQLAlchemy
+from raven.contrib.flask import Sentry
 
 
 db = SQLAlchemy()
@@ -19,6 +20,7 @@ def create_app(config):
     db.init_app(app)
     cache.init_app(app)
     github.init_app(app)
+    Sentry(app)
     register_views(app)
 
     @app.before_request
