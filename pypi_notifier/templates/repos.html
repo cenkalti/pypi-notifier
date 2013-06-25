@@ -8,8 +8,9 @@
       {% for repo in repos %}
         <li>
           <input type="checkbox", {{ "checked" if repo.checked else "" }}
-                 name="{{ repo.full_name }}" value="{{ repo.id }}">
-          {{ repo.full_name }}
+                 name="{{ repo.full_name }}" value="{{ repo.id }}"
+                 id="{{ repo.id }}">
+          <label for="{{ repo.id }}">{{ repo.full_name }}</label>
         </li>
       {% endfor %}
     </ul>

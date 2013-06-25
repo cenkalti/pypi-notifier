@@ -1,5 +1,6 @@
-from datetime import datetime
 import xmlrpclib
+from datetime import datetime
+from sqlalchemy.ext.associationproxy import association_proxy
 from pypi_notifier import db, cache
 from pypi_notifier.models.mixin import ModelMixin
 
@@ -12,6 +13,8 @@ class Package(db.Model, ModelMixin):
     latest_version = db.Column(db.String(20))
     updated_at = db.Column(db.DateTime)
     last_check = db.Column(db.DateTime)
+
+    repos = association_proxy('requirements', 'repo')
 
     pypi = xmlrpclib.ServerProxy('http://pypi.python.org/pypi')
 

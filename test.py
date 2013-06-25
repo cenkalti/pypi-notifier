@@ -65,7 +65,7 @@ class PyPINotifierTestCase(unittest.TestCase):
         """Tests SQLAlchemy relationships.
 
         When a User deletes his account all of the records should be deleted
-        except the Package which is also used by another User.
+        except Packages.
 
         """
         f = self.fixture()
@@ -76,14 +76,7 @@ class PyPINotifierTestCase(unittest.TestCase):
         assert User.query.all() == [f['u1']]
         assert Repo.query.all() == [f['r1']]
         assert Requirement.query.all() == [f['req1']]
-        assert Package.query.all() == [f['p1']], Package.query.all()
-
-    def test_remove_package(self):
-        """Do not allow removing of package that is in use."""
-        f = self.fixture()
-
-        db.session.delete(f['p1'])
-        self.assertRaises(Exception, db.session.commit)
+        assert Package.query.all() == [f['p1'], f['p2']]
 
 
 if __name__ == '__main__':

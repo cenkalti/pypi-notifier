@@ -23,7 +23,7 @@ class Requirement(db.Model, ModelMixin):
 
     package = db.relationship(
         Package,
-        backref=db.backref('repos', cascade='all, delete-orphan'))
+        backref=db.backref('requirements', cascade='all, delete-orphan'))
     repo = db.relationship(
         Repo,
         backref=db.backref('requirements', cascade="all, delete-orphan"))

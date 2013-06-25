@@ -2,6 +2,7 @@ import base64
 import logging
 from datetime import datetime
 from pkg_resources import parse_requirements
+from sqlalchemy import UniqueConstraint
 from sqlalchemy.ext.associationproxy import association_proxy
 from pypi_notifier import db, github
 from pypi_notifier.models.user import User
@@ -14,10 +15,13 @@ logger = logging.getLogger(__name__)
 
 class Repo(db.Model, ModelMixin):
     __tablename__ = 'repos'
+    __table_args__ = (
+        UniqueConstraint('user_id', 'github_id'),
+    )
 
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey(User.id))
-    github_id = db.Column(db.Integer, unique=True)
+    github_id = db.Column(db.Integer)
     name = db.Column(db.String(200))
     last_check = db.Column(db.DateTime)
     last_modified = db.Column(db.String(40))

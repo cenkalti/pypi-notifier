@@ -9,8 +9,8 @@ class User(db.Model, ModelMixin):
     name = db.Column(db.String(200))
     email = db.Column(db.String(200))
     github_id = db.Column(db.Integer, unique=True)
-    github_token = db.Column(db.Integer)
-    # last_email_sent_at = db.Column(db.DateTime)
+    github_token = db.Column(db.Integer, unique=True)
+    email_sent_at = db.Column(db.DateTime)
 
     repos = db.relationship('Repo', backref='user',
                             cascade="all, delete-orphan")
