@@ -1,5 +1,7 @@
 import logging
 from datetime import datetime, timedelta
+import pystmark
+from flask import render_template, current_app
 from sqlalchemy import or_
 from pypi_notifier import db, github
 from pypi_notifier.models.mixin import ModelMixin
@@ -50,8 +52,14 @@ class User(db.Model, ModelMixin):
         return outdateds
 
     def send_email(self):
-        template = "%s"
-        print template % self.get_outdated_requirements()
+        outdateds = self.get_outdated_requirements()
+        html = render_template('email.html', reqs=outdateds)
+        message = pystmark.Message(
+            sender='no-reply@pypi-notifier.org',
+            to=self.email,
+            subject="There are updated packages in PyPI",
+            html=html)
+        pystmark.send(message, current_app.config['POSTMARK_APIKEY'])
 
     @classmethod
     def send_emails(cls):

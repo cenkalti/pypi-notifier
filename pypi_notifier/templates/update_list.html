@@ -1,0 +1,8 @@
+<ul>
+  {% for req in reqs %}
+    <li>
+      <a href="https://pypi.python.org/pypi/{{ req.package.original_name }}"
+        >{{ req.package.original_name }}</a>
+    </li>
+  {% endfor %}
+</ul>

@@ -2,7 +2,11 @@
 
 {% block body %}
   <h1>Done.</h1>
-  You will be notified when a requirement is updated for your selected repos.
+
+  Here is the list of updated requirements as far as we know.
+  {% include 'update_list.html' %}
+
+  You will be notified via email when a requirement is updated for your selected repos.
   <br>You can go somewhere else:
 
   <li>

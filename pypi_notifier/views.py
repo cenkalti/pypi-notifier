@@ -38,8 +38,9 @@ def register_views(app):
                 db.session.delete(repo)
 
         db.session.commit()
-        return redirect(url_for('thanks'))
+        return redirect(url_for('done'))
 
-    @app.route('/thanks')
-    def thanks():
-        return render_template('thanks.html')
+    @app.route('/done')
+    def done():
+        reqs = g.user.get_outdated_requirements()
+        return render_template('done.html', reqs=reqs)

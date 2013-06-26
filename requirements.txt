@@ -10,6 +10,7 @@ Werkzeug==0.8.3
 blinker==1.2
 ipython==0.13.2
 mock==1.0.1
+pystmark==0.3.3
 raven==3.3.12
 requests==1.2.3
 verlib==0.1

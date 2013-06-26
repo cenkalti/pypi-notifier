@@ -26,3 +26,4 @@ class ProductionConfig(BaseConfig):
     GITHUB_CLIENT_SECRET = ''
     GITHUB_CALLBACK_URL = 'http://www.pypi-notifier.org/github-callback'
     SENTRY_DSN = None
+    POSTMARK_APIKEY = ''

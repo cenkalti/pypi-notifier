@@ -1,0 +1,9 @@
+{% extends "layout.html" %}
+
+{% block body %}
+  This is the list of packages updated in PyPI listed in your projects'
+  requirements.txt files.
+
+  {% include 'update_list.html' %}
+
+{% endblock %}
