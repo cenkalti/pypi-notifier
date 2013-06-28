@@ -13,8 +13,16 @@ logging.basicConfig(level=logging.DEBUG)
 
 manager = Manager(create_app)
 
-# Must be a class name from config.py
-config = os.environ['PYPI_NOTIFIER_CONFIG']
+
+try:
+    # Must be a class name from config.py
+    config = os.environ['PYPI_NOTIFIER_CONFIG']
+except KeyError:
+    print "PYPI_NOTIFIER_CONFIG is not found in env, using DevelopmentConfig."
+    print 'If you want to use another config please set it as ' \
+          '"export PYPI_NOTIFIER_CONFIG=ProductionConfig".'
+    config = 'DevelopmentConfig'
+
 manager.add_option('-c', '--config', dest='config', required=False,
                    default=config)
 
