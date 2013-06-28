@@ -1,8 +1,17 @@
-<ul>
+<table border="1">
+  <tr>
+    <th>Repository</th>
+    <th>Package</th>
+    <th>Required Version</th>
+    <th>Latest Version</th>
+  </tr>
   {% for req in reqs %}
-    <li>
-      <a href="https://pypi.python.org/pypi/{{ req.package.original_name }}"
-        >{{ req.package.original_name }}</a>
-    </li>
+  <tr>
+    <td>{{ req.repo.name }}</td>
+    <td><a href="https://pypi.python.org/pypi/{{ req.package.original_name }}"
+      >{{ req.package.original_name }}</a></td>
+    <td>{{ req.required_version }}</td>
+    <td>{{ req.package.latest_version }}</td>
+  </tr>
   {% endfor %}
-</ul>
+</table>
