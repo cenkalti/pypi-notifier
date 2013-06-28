@@ -35,6 +35,12 @@ class Repo(db.Model, ModelMixin):
     def __repr__(self):
         return "<Repo %s>" % self.name
 
+    @classmethod
+    def update_all_repos(cls):
+        for repo in cls.query.all():
+            repo.update_requirements()
+            db.session.commit()
+
     def update_requirements(self):
         """
         Fetches the content of the requirements.txt files from GitHub,
@@ -54,18 +60,18 @@ class Repo(db.Model, ModelMixin):
         self.requirements.append = requirement
 
     def parse_requirements_file(self):
-        contents = self.fetch_requirements_if_modified()
+        contents = self.fetch_requirements()
         if contents:
             for req in parse_requirements(contents):
                 yield req.project_name.lower(), req.specs
 
-    def fetch_requirements_if_modified(self):
-        headers = {'If-Modified-Since': self.last_modified}
-        return self.fetch_requirements(headers)
-
-    def fetch_requirements(self, headers=None):
+    def fetch_requirements(self):
         logger.info("Fetching requirements of repo: %s", self)
         path = 'repos/%s/contents/requirements.txt' % self.name
+        headers = None
+        if self.last_modified:
+            headers = {'If-Modified-Since': self.last_modified}
+
         response = github.raw_request('GET', path, headers=headers)
         logger.debug("Response: %s", response)
         if response.status_code == 200:

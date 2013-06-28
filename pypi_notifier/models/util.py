@@ -1,11 +1,11 @@
 import json
-from sqlalchemy.types import TypeDecorator, UnicodeText
+from sqlalchemy.types import TypeDecorator, Text
 
 
 class JSONType(TypeDecorator):
     """Represents an immutable structure as a json-encoded string."""
 
-    impl = UnicodeText
+    impl = Text
 
     def process_bind_param(self, value, dialect):
         if value is not None:

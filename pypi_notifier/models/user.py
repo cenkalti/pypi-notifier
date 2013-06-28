@@ -19,6 +19,8 @@ class User(db.Model, ModelMixin):
     github_id = db.Column(db.Integer, unique=True)
     github_token = db.Column(db.Integer, unique=True)
     email_sent_at = db.Column(db.DateTime)
+    last_check = db.Column(db.DateTime)
+    last_modified = db.Column(db.String(40))
 
     repos = db.relationship('Repo', backref='user',
                             cascade="all, delete-orphan")
@@ -29,6 +31,12 @@ class User(db.Model, ModelMixin):
     def __repr__(self):
         return "<User %s>" % self.name
 
+    @classmethod
+    def update_all_users_from_github(cls):
+        for user in cls.query.all():
+            user.update_from_github()
+            db.session.commit()
+
     def update_from_github(self):
         """
         Updates the user's name and email by asking to GitHub.
@@ -37,9 +45,22 @@ class User(db.Model, ModelMixin):
         these periodically.
 
         """
-        user = github.get('user')
-        self.name = user['login']
-        self.email = user['email']
+        headers = None
+        if self.last_modified:
+            headers = {'If-Modified-Since': self.last_modified}
+
+        response = github.raw_request('GET', 'user', headers=headers)
+        logger.debug("Response: %s", response)
+        if response.status_code == 200:
+            self.last_modified = response.headers['Last-Modified']
+            response = response.json()
+            self.name = response['login']
+            self.email = response['email']
+            self.last_check = datetime.utcnow()
+        elif response.status_code == 304:
+            self.last_check = datetime.utcnow()
+        else:
+            raise Exception("Unknown status code: %s", response.status_code)
 
     def get_outdated_requirements(self):
         outdateds = []
@@ -50,16 +71,6 @@ class User(db.Model, ModelMixin):
                     outdateds.append(req)
 
         return outdateds
-
-    def send_email(self):
-        outdateds = self.get_outdated_requirements()
-        html = render_template('email.html', reqs=outdateds)
-        message = pystmark.Message(
-            sender='no-reply@pypi-notifier.org',
-            to=self.email,
-            subject="There are updated packages in PyPI",
-            html=html)
-        pystmark.send(message, current_app.config['POSTMARK_APIKEY'])
 
     @classmethod
     def send_emails(cls):
@@ -74,3 +85,13 @@ class User(db.Model, ModelMixin):
             user.send_email()
             user.email_sent_at = datetime.utcnow()
             db.session.commit()
+
+    def send_email(self):
+        outdateds = self.get_outdated_requirements()
+        html = render_template('email.html', reqs=outdateds)
+        message = pystmark.Message(
+            sender='no-reply@pypi-notifier.org',
+            to=self.email,
+            subject="There are updated packages in PyPI",
+            html=html)
+        pystmark.send(message, current_app.config['POSTMARK_APIKEY'])

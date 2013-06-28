@@ -3,11 +3,10 @@ import os
 import errno
 import logging
 
-from flask import g, current_app
+from flask import current_app
 from flask.ext.script import Manager
 
 from pypi_notifier import create_app, db, models, cache
-from pypi_notifier.models import User, Repo, Requirement, Package
 
 
 logging.basicConfig(level=logging.DEBUG)
@@ -41,7 +40,7 @@ def drop_db():
 
 @manager.command
 def fetch_package_list():
-    Package.get_all_names()
+    models.Package.get_all_names()
 
 
 @manager.command
@@ -51,30 +50,22 @@ def clear_cache():
 
 @manager.command
 def find_latest(name):
-    print Package(name).find_latest_version()
+    print models.Package(name).find_latest_version()
 
 
 @manager.command
-def iter_users():
-    for user in User.query.all():
-        g.user = user
-        user.update_from_github()
-    db.session.commit()
+def update_users():
+    models.User.update_all_users_from_github()
 
 
 @manager.command
-def iter_repos():
-    for repo in Repo.query.all():
-        g.user = repo.user
-        repo.update_requirements()
-    db.session.commit()
+def update_repos():
+    models.Repo.update_all_repos()
 
 
 @manager.command
-def iter_packages():
-    for package in Package.query.all():
-        package.update_from_pypi()
-    db.session.commit()
+def update_packages():
+    models.Package.update_all_packages()
 
 
 @manager.command

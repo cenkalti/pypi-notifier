@@ -25,6 +25,12 @@ class Package(db.Model, ModelMixin):
         return "<Package %s>" % self.name
 
     @classmethod
+    def update_all_packages(cls):
+        for package in cls.query.all():
+            package.update_from_pypi()
+            db.session.commit()
+
+    @classmethod
     @cache.cached(timeout=3600, key_prefix='all_packages')
     def get_all_names(cls):
         packages = cls.pypi.list_packages()
