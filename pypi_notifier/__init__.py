@@ -17,9 +17,11 @@ def create_app(config):
 
     app = Flask(__name__)
     load_config(app, config)
+
     db.init_app(app)
     cache.init_app(app)
     github.init_app(app)
+
     register_views(app)
 
     if app.config.get('SENTRY_DSN'):
