@@ -3,12 +3,14 @@
 {% block body %}
   <h1>Done.</h1>
 
+  {% if reqs %}
   Here is the list of updated requirements as far as we know.
   {% include 'update_list.html' %}
+  {% endif %}
 
   You will be notified via email when a requirement is updated for your selected repos.
-  <br>You can go somewhere else:
-
+  <br><br>
+  Go somewhere else now:
   <ul>
     <li><a href="http://www.reddit.com/r/python">r/python</a></li>
   </ul>
