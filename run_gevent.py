@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 from gevent.monkey import patch_all; patch_all()
 from gevent.wsgi import WSGIServer
 from pypi_notifier import create_app
