@@ -77,7 +77,7 @@ def create_app(config):
     @app.route('/login')
     def login():
         if session.get('user_id', None) is None or g.user is None:
-            return github.authorize(scope='user:email, public_repo')
+            return github.authorize(scope='user:email')
         else:
             return redirect(url_for('index'))
 
