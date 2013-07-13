@@ -46,14 +46,13 @@ def create_app(config):
 
     @app.route('/github-callback')
     @github.authorized_handler
-    def oauth_authorized(resp):
+    def oauth_authorized(token):
         next_url = request.args.get('next') or url_for('repos')
 
-        if resp is None:
+        if token is None:
             flash('You denied the request to sign in.')
             return redirect(next_url)
 
-        token = resp['access_token']
         user_response = github.get('user', params={'access_token': token})
         github_id = user_response['id']
         user = User.query.filter_by(github_token=token).first()
