@@ -49,7 +49,9 @@ class User(db.Model, ModelMixin):
         if self.last_modified:
             headers = {'If-Modified-Since': self.last_modified}
 
-        response = github.raw_request('GET', 'user', headers=headers)
+        params = {'access_token': self.github_token}
+        response = github.raw_request('GET', 'user',
+                                      headers=headers, params=params)
         logger.debug("Response: %s", response)
         if response.status_code == 200:
             self.last_modified = response.headers['Last-Modified']
