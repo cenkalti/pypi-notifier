@@ -14,6 +14,11 @@ with::
 
     pip install -r requirements.txt
 
+Configuration
+-------------
+
+Copy ``config.example.py`` as ``config.py`` and fill the values.
+
 Running Web Server
 ------------------
 
