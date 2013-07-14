@@ -17,7 +17,8 @@ with::
 Running Web Server
 ------------------
 
-Web server is run with gevent. There is a script for running the web server::
+Web server is run with `gevent <http://www.gevent.org/>`_.
+There is a script for running the web server::
 
     ./run_gevent.py
 
