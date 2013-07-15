@@ -48,7 +48,10 @@ class Repo(db.Model, ModelMixin):
 
         """
         for poject_name, specs in self.parse_requirements_file():
-            self.add_new_requirement(poject_name, specs)
+            # specs may be empty list if no version is specified in file
+            # No need to add to table since we can't check updates.
+            if specs:
+                self.add_new_requirement(poject_name, specs)
 
         self.last_check = datetime.utcnow()
 
