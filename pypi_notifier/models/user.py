@@ -19,8 +19,6 @@ class User(db.Model, ModelMixin):
     github_id = db.Column(db.Integer, unique=True)
     github_token = db.Column(db.Integer, unique=True)
     email_sent_at = db.Column(db.DateTime)
-    last_check = db.Column(db.DateTime)
-    last_modified = db.Column(db.String(40))
 
     repos = db.relationship('Repo', backref='user',
                             cascade="all, delete-orphan")
