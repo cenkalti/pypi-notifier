@@ -66,6 +66,7 @@ def create_app(config):
         user.github_id = github_id
         user.name = user_response['login']
         user.email = user_response['email']
+        assert user.email
         db.session.commit()
         session['user_id'] = user.id
         return redirect(next_url)
