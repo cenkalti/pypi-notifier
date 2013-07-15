@@ -32,9 +32,9 @@ class PyPINotifierTestCase(unittest.TestCase):
         assert 'github.com' in rv.headers['Location']
 
     @patch.object(GitHub, 'get')
-    @patch.object(GitHub, 'handle_response')
+    @patch.object(GitHub, '_handle_response')
     def test_github_callback(self, handle_response, get):
-        handle_response.return_value = {'access_token': 'asdf'}
+        handle_response.return_value = 'asdf'
         get.return_value = {'id': 1, 'login': 'cenkalti', 'email': 'cenk@x.com'}
 
         self.client.get('/github-callback?code=xxxx')
@@ -45,7 +45,9 @@ class PyPINotifierTestCase(unittest.TestCase):
 
     def fixture(self):
         u1 = User('u1')
+        u1.email = 'test@test'
         u2 = User('u2')
+        u2.email = 'test@test'
         r1 = Repo('r1', u1)
         r2 = Repo('r2', u2)
         p1 = Package('p1')
@@ -80,6 +82,7 @@ class PyPINotifierTestCase(unittest.TestCase):
 
     def test_update_requirements(self):
         u = User('t')
+        u.email = 'test@test'
         r = Repo(2, u)
         db.session.add(r)
         db.session.commit()
