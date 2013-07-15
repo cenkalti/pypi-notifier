@@ -85,5 +85,9 @@ class Repo(db.Model, ModelMixin):
                 raise Exception("Unknown encoding: %s" % response['encoding'])
         elif response.status_code == 304:
             return None
+        elif response.status_code == 404:
+            # requirements.txt file is not found.
+            # Remove the repo so we won't check it again.
+            db.session.delete(self)
         else:
             raise Exception("Unknown status code: %s" % response.status_code)
