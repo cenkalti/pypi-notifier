@@ -18,6 +18,9 @@ class TestingConfig(BaseConfig):
     TESTING = True
     CSRF_ENABLED = False
     DEBUG_TB_ENABLED = False
+    GITHUB_CLIENT_ID = 'a'
+    GITHUB_CLIENT_SECRET = 'b'
+    GITHUB_CALLBACK_URL = 'http://localhost:5000/github-callback'
 
 
 class ProductionConfig(BaseConfig):
