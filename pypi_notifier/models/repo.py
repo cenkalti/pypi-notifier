@@ -86,4 +86,4 @@ class Repo(db.Model, ModelMixin):
         elif response.status_code == 304:
             return None
         else:
-            raise Exception("Unknown status code: %s", response.status_code)
+            raise Exception("Unknown status code: %s" % response.status_code)
