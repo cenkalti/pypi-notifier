@@ -62,11 +62,6 @@ def find_latest(name):
 
 
 @manager.command
-def update_users():
-    models.User.update_all_users_from_github()
-
-
-@manager.command
 def update_repos():
     models.Repo.update_all_repos()
 

@@ -15,7 +15,7 @@ class User(db.Model, ModelMixin):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200))
-    email = db.Column(db.String(200))
+    email = db.Column(db.String(200), nullable=False)
     github_id = db.Column(db.Integer, unique=True)
     github_token = db.Column(db.Integer, unique=True)
     email_sent_at = db.Column(db.DateTime)
@@ -30,39 +30,6 @@ class User(db.Model, ModelMixin):
 
     def __repr__(self):
         return "<User %s>" % self.name
-
-    @classmethod
-    def update_all_users_from_github(cls):
-        for user in cls.query.all():
-            user.update_from_github()
-            db.session.commit()
-
-    def update_from_github(self):
-        """
-        Updates the user's name and email by asking to GitHub.
-
-        Name and email of the user may be changed so we should update
-        these periodically.
-
-        """
-        headers = None
-        if self.last_modified:
-            headers = {'If-Modified-Since': self.last_modified}
-
-        params = {'access_token': self.github_token}
-        response = github.raw_request('GET', 'user',
-                                      headers=headers, params=params)
-        logger.debug("Response: %s", response)
-        if response.status_code == 200:
-            self.last_modified = response.headers['Last-Modified']
-            response = response.json()
-            self.name = response['login']
-            self.email = response['email']
-            self.last_check = datetime.utcnow()
-        elif response.status_code == 304:
-            self.last_check = datetime.utcnow()
-        else:
-            raise Exception("Unknown status code: %s", response.status_code)
 
     def get_outdated_requirements(self):
         outdateds = []
