@@ -31,7 +31,7 @@ Flask development server can be run with the following command::
 
     ./manage.py runserver
 
-Running Backgrund Jobs
+Running Jobs
 ----------------------
 
 This script is run by cron::
