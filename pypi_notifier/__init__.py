@@ -9,6 +9,7 @@ from raven.contrib.flask import Sentry
 db = SQLAlchemy()
 cache = Cache()
 github = GitHub()
+sentry = Sentry()
 
 
 def create_app(config):
@@ -23,11 +24,10 @@ def create_app(config):
     db.init_app(app)
     cache.init_app(app)
     github.init_app(app)
+    if app.config.get('SENTRY_DSN'):
+        sentry.init_app(app)
 
     register_views(app)
-
-    if app.config.get('SENTRY_DSN'):
-        Sentry(app)
 
     @app.before_request
     def set_user():

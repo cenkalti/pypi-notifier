@@ -2,16 +2,15 @@
 import os
 import errno
 import logging
+from functools import wraps
 
+import flask.ext.script
 from flask import current_app
-from flask.ext.script import Manager
 
-from pypi_notifier import create_app, db, models, cache
+from pypi_notifier import create_app, db, models, cache, sentry
 
 
 logging.basicConfig(level=logging.DEBUG)
-
-manager = Manager(create_app)
 
 
 try:
@@ -23,6 +22,28 @@ except KeyError:
           '"export PYPI_NOTIFIER_CONFIG=ProductionConfig".'
     config = 'DevelopmentConfig'
 
+
+class Manager(flask.ext.script.Manager):
+    """Subclassed to send exception information to Senry on command errors."""
+    def command(self, func):
+        func = catch_exception(func)
+        return super(Manager, self).command(func)
+
+
+def catch_exception(f):
+    """Sends exception information to Sentry and reraises it."""
+    @wraps(f)
+    def inner(*args, **kwargs):
+        try:
+            return f(*args, **kwargs)
+        except Exception:
+            if getattr(sentry, 'app', None):
+                sentry.captureException()
+            raise
+    return inner
+
+
+manager = Manager(create_app)
 manager.add_option('-c', '--config', dest='config', required=False,
                    default=config)
 
