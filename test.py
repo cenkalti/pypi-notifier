@@ -94,6 +94,12 @@ class PyPINotifierTestCase(unittest.TestCase):
         assert (reqs[0].package.name, reqs[0].required_version) == ('a', '1.0')
         assert (reqs[1].package.name, reqs[1].required_version) == ('b', '2.1')
 
+    def test_strip_index_url(self):
+        s = "-i http://simple.crate.io/\ndjango\ncelery"
+        from pypi_notifier.models.repo import strip_index_url
+        s = strip_index_url(s)
+        assert s == 'django\ncelery'
+
 
 if __name__ == '__main__':
     unittest.main()

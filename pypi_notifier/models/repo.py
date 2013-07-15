@@ -62,8 +62,10 @@ class Repo(db.Model, ModelMixin):
     def parse_requirements_file(self):
         contents = self.fetch_requirements()
         if contents:
-            for req in parse_requirements(contents):
-                yield req.project_name.lower(), req.specs
+            contents = strip_index_url(contents)
+            if contents:
+                for req in parse_requirements(contents):
+                    yield req.project_name.lower(), req.specs
 
     def fetch_requirements(self):
         logger.info("Fetching requirements of repo: %s", self)
@@ -91,3 +93,15 @@ class Repo(db.Model, ModelMixin):
             db.session.delete(self)
         else:
             raise Exception("Unknown status code: %s" % response.status_code)
+
+
+def strip_index_url(s):
+    """
+    Returns a new str without the --index-url opiton line.
+
+    pkg_resources.parse_requirements() cannot parse the file if it contains
+    an option for index url. Example: "-i http://simple.crate.io/"
+
+    """
+    is_index_url_line = lambda x: x.startswith(('-i', '--index-url'))
+    return '\n'.join(l for l in s.splitlines() if not is_index_url_line(l))
