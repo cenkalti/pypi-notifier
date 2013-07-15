@@ -62,7 +62,7 @@ class Repo(db.Model, ModelMixin):
     def parse_requirements_file(self):
         contents = self.fetch_requirements()
         if contents:
-            contents = strip_index_url(contents)
+            contents = strip_requirements(contents)
             if contents:
                 for req in parse_requirements(contents):
                     yield req.project_name.lower(), req.specs
@@ -95,13 +95,19 @@ class Repo(db.Model, ModelMixin):
             raise Exception("Unknown status code: %s" % response.status_code)
 
 
-def strip_index_url(s):
+def strip_requirements(s):
     """
-    Returns a new str without the --index-url opiton line.
+    Cleans up requirements.txt contents and returns as new str.
 
     pkg_resources.parse_requirements() cannot parse the file if it contains
-    an option for index url. Example: "-i http://simple.crate.io/"
+    an option for index URL.
+        Example: "-i http://simple.crate.io/"
+
+    Also it cannot parse the repository URLs.
+        Example: git+https://github.com/pythonforfacebook/facebook-sdk.git
 
     """
     is_index_url_line = lambda x: x.startswith(('-i', '--index-url'))
-    return '\n'.join(l for l in s.splitlines() if not is_index_url_line(l))
+    is_repository = lambda x: x.startswith(('git+', 'svn+', 'hg+', 'bzr+'))
+    return '\n'.join(l for l in s.splitlines()
+                     if not is_index_url_line(l) and not is_repository(l))

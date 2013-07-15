@@ -96,8 +96,8 @@ class PyPINotifierTestCase(unittest.TestCase):
 
     def test_strip_index_url(self):
         s = "-i http://simple.crate.io/\ndjango\ncelery"
-        from pypi_notifier.models.repo import strip_index_url
-        s = strip_index_url(s)
+        from pypi_notifier.models.repo import strip_requirements
+        s = strip_requirements(s)
         assert s == 'django\ncelery'
 
 
