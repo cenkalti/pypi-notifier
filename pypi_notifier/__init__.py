@@ -1,7 +1,7 @@
 from flask import Flask, g, session, request, url_for, redirect, flash, \
     render_template
 from flask.ext.cache import Cache
-from flask.ext.github import GitHub
+from flask.ext.github import GitHub, GitHubError
 from flask.ext.sqlalchemy import SQLAlchemy
 from raven.contrib.flask import Sentry
 
@@ -14,6 +14,8 @@ github = GitHub()
 def create_app(config):
     from pypi_notifier.views import register_views
     from pypi_notifier.models import User
+
+    SCOPE = 'user:email'
 
     app = Flask(__name__)
     load_config(app, config)
@@ -65,6 +67,7 @@ def create_app(config):
         user.github_token = token
         user.github_id = github_id
         user.name = user_response['login']
+        g.user = user
         user.email = user_response.get('email') or github.get('user/emails')[0]
         db.session.commit()
 
@@ -78,7 +81,7 @@ def create_app(config):
     @app.route('/login')
     def login():
         if session.get('user_id', None) is None or g.user is None:
-            return github.authorize(scope='user:email')
+            return github.authorize(scope=SCOPE)
         else:
             return redirect(url_for('index'))
 
@@ -86,6 +89,13 @@ def create_app(config):
     def logout():
         session.pop('user_id', None)
         return redirect(url_for('index'))
+
+    @app.errorhandler(GitHubError)
+    def handle_github_error(error):
+        if error.response.status_code == 401:
+            return github.authorize(scope=SCOPE)
+        else:
+            return "Github returned: %s" % error
 
     return app
 
