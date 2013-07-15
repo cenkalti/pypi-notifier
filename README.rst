@@ -34,8 +34,6 @@ Flask development server can be run with the following command::
 Running Backgrund Jobs
 ----------------------
 
-There are 3 jobs that needed to be run periodically::
+This script is run by cron::
 
-    ./manage.py update_repos     # Fetches requirements
-    ./manage.py update_packages  # Checks latest versions from PyPI
-    ./manage.py send_emails      # Notifies users about updates
+    ./run_jobs.sh
