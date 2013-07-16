@@ -49,8 +49,9 @@ def register_views(app):
     def unsubscribe():
         if request.method == 'POST':
             if request.form['confirm'] == 'yes':
-                db.session.delete(g.user)
-                db.session.commit()
+                if g.user:
+                    db.session.delete(g.user)
+                    db.session.commit()
                 return render_template('unsubscribed.html')
             else:
                 return redirect(url_for('index'))
