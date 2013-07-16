@@ -1,6 +1,6 @@
 import logging
 import xmlrpclib
-from datetime import datetime
+from datetime import datetime, timedelta
 from sqlalchemy.ext.associationproxy import association_proxy
 from pypi_notifier import db, cache
 from pypi_notifier.models.mixin import ModelMixin
@@ -35,8 +35,10 @@ class Package(db.Model, ModelMixin):
     @classmethod
     def update_all_packages(cls):
         for package in cls.query.all():
-            package.update_from_pypi()
-            db.session.commit()
+            day_ago = datetime.utcnow() - timedelta(days=1)
+            if package.last_check and package.last_check < day_ago:
+                package.update_from_pypi()
+                db.session.commit()
 
     @classmethod
     @cache.cached(timeout=3600, key_prefix='all_packages')
