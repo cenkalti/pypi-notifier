@@ -1,3 +1,5 @@
+import operator
+
 from flask import render_template, request, redirect, url_for, g
 
 from pypi_notifier import db, github
@@ -13,10 +15,24 @@ def register_views(app):
     @app.route('/repos')
     def repos():
         repos = github.get('user/repos')
+        repos = with_organization_repos(repos)
         selected_ids = [r.github_id for r in g.user.repos]
         for repo in repos:
             repo['checked'] = (repo['id'] in selected_ids)
         return render_template('repos.html', repos=repos)
+
+    def with_organization_repos(repos):
+        all_repos = {r['id']: r for r in repos}  # index by id
+        orgs = github.get('user/orgs')
+        orgs_names = [o['login'] for o in orgs]
+        for org_name in orgs_names:
+            org_repos = github.get('orgs/%s/repos' % org_name)
+            for repo in org_repos:
+                all_repos[repo['id']] = repo  # add each repo for each org.
+
+        all_repos = all_repos.values()
+        all_repos.sort(key=operator.itemgetter('full_name'))
+        return all_repos
 
     @app.route('/repos', methods=['POST'])
     def post_repos():
