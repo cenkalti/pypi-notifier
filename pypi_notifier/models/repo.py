@@ -35,6 +35,10 @@ class Repo(db.Model, ModelMixin):
     def __repr__(self):
         return "<Repo %s>" % self.name
 
+    @property
+    def url(self):
+        return "https://github.com/%s" % self.name
+
     @classmethod
     def update_all_repos(cls):
         for repo in cls.query.all():
