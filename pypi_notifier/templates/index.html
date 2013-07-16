@@ -18,8 +18,15 @@
     </nav>
 
   {% else %}
-    <a href={{ url_for('login') }}>Login with your GitHub account*</a>
-
-    <p>*It asks permission to access only public repositories.</p>
+    <ul>
+      <li>
+        <a href={{ url_for('login') }}
+          >Login with your GitHub account (public repos only)</a>
+      </li>
+      <li>
+        <a href={{ url_for('login', private=True) }}
+          >Login with your GitHub account (public and private repos)</a>
+      </li>
+    </ul>
   {% endif %}
 {% endblock %}

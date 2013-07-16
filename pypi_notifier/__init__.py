@@ -81,7 +81,12 @@ def create_app(config):
     @app.route('/login')
     def login():
         if session.get('user_id', None) is None or g.user is None:
-            return github.authorize(scope=SCOPE)
+            if request.args.get('private') == 'True':
+                scope = 'user:email,repo'
+            else:
+                scope = 'user:email'
+
+            return github.authorize(scope=scope)
         else:
             return redirect(url_for('index'))
 
@@ -93,7 +98,8 @@ def create_app(config):
     @app.errorhandler(GitHubError)
     def handle_github_error(error):
         if error.response.status_code == 401:
-            return github.authorize(scope=SCOPE)
+            session.pop('user_id', None)
+            return render_template('github-401.html')
         else:
             return "Github returned: %s" % error
 
