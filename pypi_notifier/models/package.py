@@ -28,6 +28,10 @@ class Package(db.Model, ModelMixin):
     def __repr__(self):
         return "<Package %s>" % self.name
 
+    @property
+    def url(self):
+        return "https://pypi.python.org/pypi/%s" % self.original_name
+
     @classmethod
     def update_all_packages(cls):
         for package in cls.query.all():

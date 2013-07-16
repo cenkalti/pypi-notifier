@@ -8,8 +8,7 @@
   {% for req in reqs %}
   <tr>
     <td><a href="{{ req.repo.url }}">{{ req.repo.name }}</a></td>
-    <td><a href="https://pypi.python.org/pypi/{{ req.package.original_name }}"
-      >{{ req.package.original_name }}</a></td>
+    <td><a href="{{ req.package.url }}">{{ req.package.original_name }}</a></td>
     <td>{{ req.required_version }}</td>
     <td>{{ req.package.latest_version }}</td>
   </tr>
