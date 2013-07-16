@@ -92,8 +92,11 @@ class Repo(db.Model, ModelMixin):
                 return base64.b64decode(response['content'])
             else:
                 raise Exception("Unknown encoding: %s" % response['encoding'])
-        elif response.status_code == 304:
+        elif response.status_code == 304:  # Not modified
             return None
+        elif response.status_code == 401:
+            # User's token is not valid. Let's delete the user.
+            db.session.delete(self.user)
         elif response.status_code == 404:
             # requirements.txt file is not found.
             # Remove the repo so we won't check it again.
