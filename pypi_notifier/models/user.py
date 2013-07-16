@@ -63,3 +63,9 @@ class User(db.Model, ModelMixin):
             html=html)
         response = pystmark.send(message, current_app.config['POSTMARK_APIKEY'])
         response.raise_for_status()
+
+    def get_emails_from_github(self):
+        params = {'access_token': self.github_token}
+        headers = {'Accept': 'application/vnd.github.v3'}
+        emails = github.get('user/emails', params=params, headers=headers)
+        return [e for e in emails if e['verified']]

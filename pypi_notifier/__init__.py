@@ -1,5 +1,5 @@
 from flask import Flask, g, session, request, url_for, redirect, flash, \
-    render_template
+    render_template, abort
 from flask.ext.cache import Cache
 from flask.ext.github import GitHub, GitHubError
 from flask.ext.sqlalchemy import SQLAlchemy
@@ -66,11 +66,29 @@ def create_app(config):
         user.github_id = github_id
         user.name = user_response['login']
         g.user = user
-        user.email = user_response.get('email') or github.get('user/emails')[0]
-        db.session.commit()
 
+        emails = user.get_emails_from_github()
+        user.email = [e['email'] for e in emails if e['primary']][0]
+        db.session.commit()
         session['user_id'] = user.id
-        return redirect(next_url)
+
+        if len(emails) > 1:
+            return redirect(url_for('select_email'))
+        else:
+            return redirect(next_url)
+
+    @app.route('/select-email', methods=['GET', 'POST'])
+    def select_email():
+        emails = g.user.get_emails_from_github()
+        if request.method == 'POST':
+            selected = request.form['email']
+            if selected not in [e['email'] for e in emails]:
+                abort(400)
+
+            g.user.email = selected
+            db.session.commit()
+            return redirect(url_for('repos'))
+        return render_template("select-email.html", emails=emails)
 
     @app.route('/')
     def index():

@@ -1,0 +1,19 @@
+{% extends "layout.html" %}
+
+{% block body %}
+  You have more than one email registered with GitHub.
+  Select the one that you want to be notified:
+  <form method=post>
+    <ul style="list-style: none">
+      {% for email in emails %}
+        <li>
+          <input type="radio" {{ "checked" if email['primary'] else "" }}
+                 name="email" value="{{ email['email'] }}"
+                 id="{{ loop.index }}">
+          <label for="{{ loop.index }}">{{ email['email'] }}</label>
+        </li>
+      {% endfor %}
+    </ul>
+    <button type="submit">Select</button>
+  </form>
+{% endblock %}
