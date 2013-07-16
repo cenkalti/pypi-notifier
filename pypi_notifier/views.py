@@ -44,3 +44,14 @@ def register_views(app):
     def done():
         reqs = g.user.get_outdated_requirements()
         return render_template('done.html', reqs=reqs)
+
+    @app.route('/unsubscribe', methods=['GET', 'POST'])
+    def unsubscribe():
+        if request.method == 'POST':
+            if request.form['confirm'] == 'yes':
+                db.session.delete(g.user)
+                db.session.commit()
+                return render_template('unsubscribed.html')
+            else:
+                return redirect(url_for('index'))
+        return render_template('unsubscribe-confirm.html')
