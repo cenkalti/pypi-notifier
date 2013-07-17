@@ -35,10 +35,12 @@ class Package(db.Model, ModelMixin):
 
     @classmethod
     def update_all_packages(cls):
-        packages = cls.query.all(
+        packages = cls.query.filter(
             or_(
                 cls.last_check <= datetime.utcnow() - timedelta(days=1),
-                cls.last_check == None))
+                cls.last_check == None
+            )
+        ).all()
         for package in packages:
             package.update_from_pypi()
             db.session.commit()
