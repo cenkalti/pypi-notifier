@@ -51,14 +51,14 @@ class Repo(db.Model, ModelMixin):
         parses the file and adds each requirement to the repo.
 
         """
-        for poject_name, specs in self.parse_requirements_file():
+        for project_name, specs in self.parse_requirements_file():
             # specs may be empty list if no version is specified in file
             # No need to add to table since we can't check updates.
             if specs:
                 # If the project is not registered on PyPI,
                 # we are not adding it.
-                if poject_name.lower() in Package.get_all_names():
-                    self.add_new_requirement(poject_name, specs)
+                if project_name.lower() in Package.get_all_names():
+                    self.add_new_requirement(project_name, specs)
 
         self.last_check = datetime.utcnow()
 
