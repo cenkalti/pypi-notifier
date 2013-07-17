@@ -55,14 +55,17 @@ class User(db.Model, ModelMixin):
 
     def send_email(self):
         outdateds = self.get_outdated_requirements()
-        html = render_template('email.html', reqs=outdateds)
-        message = pystmark.Message(
-            sender='no-reply@pypi-notifier.org',
-            to=self.email,
-            subject="There are updated packages in PyPI",
-            html=html)
-        response = pystmark.send(message, current_app.config['POSTMARK_APIKEY'])
-        response.raise_for_status()
+        if outdateds:
+            html = render_template('email.html', reqs=outdateds)
+            message = pystmark.Message(
+                sender='no-reply@pypi-notifier.org',
+                to=self.email,
+                subject="There are updated packages in PyPI",
+                html=html)
+            response = pystmark.send(message, current_app.config['POSTMARK_APIKEY'])
+            response.raise_for_status()
+        else:
+            logger.info("No outdated requirement.")
 
     def get_emails_from_github(self):
         params = {'access_token': self.github_token}
