@@ -117,7 +117,10 @@ def strip_requirements(s):
         Example: git+https://github.com/pythonforfacebook/facebook-sdk.git
 
     """
-    is_index_url_line = lambda x: x.startswith(('-i', '--index-url'))
-    is_repository = lambda x: x.startswith(('git+', 'svn+', 'hg+', 'bzr+'))
+    ignore_lines = (
+        '-e',  # editable
+        '-i', '--index-url',  # other source
+        'git+', 'svn+', 'hg+', 'bzr+',  # vcs
+    )
     return '\n'.join(l for l in s.splitlines()
-                     if not is_index_url_line(l) and not is_repository(l))
+                     if not l.strip().startswith(ignore_lines))
