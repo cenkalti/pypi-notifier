@@ -55,7 +55,10 @@ class Repo(db.Model, ModelMixin):
             # specs may be empty list if no version is specified in file
             # No need to add to table since we can't check updates.
             if specs:
-                self.add_new_requirement(poject_name, specs)
+                # If the project is not registered on PyPI,
+                # we are not adding it.
+                if poject_name.lower() in Package.get_all_names():
+                    self.add_new_requirement(poject_name, specs)
 
         self.last_check = datetime.utcnow()
 
