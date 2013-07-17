@@ -31,11 +31,15 @@ class PyPINotifierTestCase(unittest.TestCase):
         assert rv.status_code == 302
         assert 'github.com' in rv.headers['Location']
 
+    @patch.object(User, 'get_emails_from_github')
     @patch.object(GitHub, 'get')
     @patch.object(GitHub, '_handle_response')
-    def test_github_callback(self, handle_response, get):
+    def test_github_callback(self, handle_response, get, get_emails_from_github):
         handle_response.return_value = 'asdf'
         get.return_value = {'id': 1, 'login': 'cenkalti', 'email': 'cenk@x.com'}
+        get_emails_from_github.return_value = [{'email': 'cenk@x.com',
+                                                'primary': True,
+                                                'verified': True}]
 
         self.client.get('/github-callback?code=xxxx')
 
