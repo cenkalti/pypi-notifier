@@ -121,6 +121,7 @@ def strip_requirements(s):
         '-e',  # editable
         '-i', '--index-url',  # other source
         'git+', 'svn+', 'hg+', 'bzr+',  # vcs
+        '-r',  # include other files (not supported yet) TODO
     )
     return '\n'.join(l for l in s.splitlines()
                      if not l.strip().startswith(ignore_lines))
