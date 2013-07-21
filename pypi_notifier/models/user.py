@@ -62,7 +62,8 @@ class User(db.Model, ModelMixin):
                 to=self.email,
                 subject="There are updated packages in PyPI",
                 html=html)
-            response = pystmark.send(message, current_app.config['POSTMARK_APIKEY'])
+            response = pystmark.send(message,
+                                     current_app.config['POSTMARK_APIKEY'])
             response.raise_for_status()
         else:
             logger.info("No outdated requirement.")
