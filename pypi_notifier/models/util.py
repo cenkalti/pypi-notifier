@@ -1,5 +1,8 @@
 import json
+
 from sqlalchemy.types import TypeDecorator, Text
+
+from pypi_notifier import db, sentry
 
 
 class JSONType(TypeDecorator):
@@ -16,3 +19,12 @@ class JSONType(TypeDecorator):
         if value is not None:
             value = json.loads(value)
         return value
+
+
+def skip_errors(objects):
+    for obj in objects:
+        try:
+            yield obj
+        except Exception:
+            sentry.captureException()
+            db.session.rollback()

@@ -5,6 +5,7 @@ from sqlalchemy import or_
 from sqlalchemy.ext.associationproxy import association_proxy
 from pypi_notifier import db, cache
 from pypi_notifier.models.mixin import ModelMixin
+from pypi_notifier.models.util import skip_errors
 
 
 logger = logging.getLogger(__name__)
@@ -41,7 +42,7 @@ class Package(db.Model, ModelMixin):
                 cls.last_check == None
             )
         ).all()
-        for package in packages:
+        for package in skip_errors(packages):
             package.update_from_pypi()
             db.session.commit()
 

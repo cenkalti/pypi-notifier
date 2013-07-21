@@ -5,6 +5,7 @@ from flask import render_template, current_app
 from sqlalchemy import or_
 from pypi_notifier import db, github
 from pypi_notifier.models.mixin import ModelMixin
+from pypi_notifier.models.util import skip_errors
 
 
 logger = logging.getLogger(__name__)
@@ -47,7 +48,7 @@ class User(db.Model, ModelMixin):
                 cls.email_sent_at == None
             )
         ).all()
-        for user in users:
+        for user in skip_errors(users):
             logger.info(user)
             user.send_email()
             user.email_sent_at = datetime.utcnow()
