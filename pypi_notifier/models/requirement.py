@@ -1,5 +1,5 @@
 import logging
-from verlib import NormalizedVersion as Version
+from verlib import NormalizedVersion as Version, IrrationalVersionError
 from pypi_notifier import db
 from pypi_notifier.models.repo import Repo
 from pypi_notifier.models.package import Package
@@ -51,4 +51,7 @@ class Requirement(db.Model, ModelMixin):
         if not latest_version:
             raise Exception("Latest version of the package is unknown.")
 
-        return Version(self.required_version) == Version(latest_version)
+        try:
+            return Version(self.required_version) == Version(latest_version)
+        except IrrationalVersionError:
+            return False
