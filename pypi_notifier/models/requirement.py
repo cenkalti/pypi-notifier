@@ -54,4 +54,20 @@ class Requirement(db.Model, ModelMixin):
         try:
             return Version(self.required_version) == Version(latest_version)
         except IrrationalVersionError:
-            return False
+            return poor_mans_version_compare(self.required_version,
+                                             latest_version)
+
+
+def poor_mans_version_compare(v1, v2):
+    """Check for equality of two version strings that cannot be compared by
+    verlib. Example: "0.3.2.RC1"""
+    def to_list(v):
+        parts = v.split('.')
+        # Try to convert each part to int
+        for i in range(len(parts)):
+            try:
+                parts[i] = int(parts[i])
+            except Exception:
+                pass
+        return parts
+    return to_list(v1) == to_list(v2)
