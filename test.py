@@ -84,7 +84,10 @@ class PyPINotifierTestCase(unittest.TestCase):
         assert Requirement.query.all() == [f['req1']]
         assert Package.query.all() == [f['p1'], f['p2']]
 
-    def test_update_requirements(self):
+    @patch.object(Package, 'get_all_names')
+    def test_update_requirements(self, get_all_names):
+        get_all_names.return_value = {'a': 'a', 'b': 'b'}
+
         u = User('t')
         u.email = 'test@test'
         r = Repo(2, u)
@@ -97,7 +100,7 @@ class PyPINotifierTestCase(unittest.TestCase):
             db.session.commit()
 
         reqs = Requirement.query.all()
-        assert len(reqs) == 2
+        assert len(reqs) == 2, reqs
         assert (reqs[0].package.name, reqs[0].required_version) == ('a', '1.0')
         assert (reqs[1].package.name, reqs[1].required_version) == ('b', '2.1')
 
