@@ -42,7 +42,7 @@ class Requirement(db.Model, ModelMixin):
         logger.debug("Finding version of %s", self)
         for specifier, version in self.specs:
             logger.debug("specifier: %s, version: %s", specifier, version)
-            if specifier in ('==', '>='):
+            if specifier == '==':
                 return version
 
     @property
