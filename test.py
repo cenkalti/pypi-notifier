@@ -95,7 +95,7 @@ class PyPINotifierTestCase(unittest.TestCase):
         db.session.commit()
 
         with patch.object(Repo, 'fetch_requirements') as fetch_requirements:
-            fetch_requirements.return_value = "a==1.0\nb>=2.1"
+            fetch_requirements.return_value = "a==1.0\nb==2.1"
             r.update_requirements()
             db.session.commit()
 
