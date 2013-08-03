@@ -1,8 +1,14 @@
 import json
+import logging
+import traceback
+from contextlib import contextmanager
 
 from sqlalchemy.types import TypeDecorator, Text
 
-from pypi_notifier import db, sentry
+from pypi_notifier import db
+
+
+logger = logging.getLogger(__name__)
 
 
 class JSONType(TypeDecorator):
@@ -21,10 +27,16 @@ class JSONType(TypeDecorator):
         return value
 
 
-def skip_errors(objects):
-    for obj in objects:
-        try:
-            yield obj
-        except Exception:
-            sentry.captureException()
-            db.session.rollback()
+@contextmanager
+def ignored(*exceptions):
+    """Context manager to ignore specifed exceptions
+
+         with ignored(OSError):
+             os.remove(somefile)
+
+    """
+    try:
+        yield
+    except exceptions:
+        db.session.rollback()
+        logger.error(''.join(traceback.format_exc()))

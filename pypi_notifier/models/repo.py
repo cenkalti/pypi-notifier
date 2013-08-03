@@ -8,7 +8,7 @@ from pypi_notifier import db, github
 from pypi_notifier.models.user import User
 from pypi_notifier.models.package import Package
 from pypi_notifier.models.mixin import ModelMixin
-from pypi_notifier.models.util import skip_errors
+from pypi_notifier.models.util import ignored
 
 
 logger = logging.getLogger(__name__)
@@ -43,9 +43,10 @@ class Repo(db.Model, ModelMixin):
     @classmethod
     def update_all_repos(cls):
         repos = cls.query.all()
-        for repo in skip_errors(repos):
-            repo.update_requirements()
-            db.session.commit()
+        for repo in repos:
+            with ignored(Exception):
+                repo.update_requirements()
+                db.session.commit()
 
     def update_requirements(self):
         """
