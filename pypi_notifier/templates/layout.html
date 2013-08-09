@@ -1,10 +1,27 @@
-<!doctype html>
-<title>PyPI Notifier</title>
-
-<a href="https://github.com/cenkalti/pypi-notifier"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png" alt="Fork me on GitHub"></a>
-
-{% for message in get_flashed_messages() %}
-  <p class=message>{{ message }}
-{% endfor %}
-
-{% block body %}{% endblock %}
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>PyPI Notifier</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0-rc1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='custom.css') }}">
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0-rc1/js/bootstrap.min.js"></script>
+  </head>
+  <body>
+    <a target="_blank" href="https://github.com/cenkalti/pypi-notifier"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png" alt="Fork me on GitHub"></a>
+    <div class="container">
+      <header>
+        <h3 class="text-muted">PyPI Notifier</h3>
+      </header>
+      <div class="body-content">
+      {% for message in get_flashed_messages() %}
+        <p class="alert">{{ message }}</p>
+      {% endfor %}
+      {% block body %}{% endblock %}
+      </div>
+    </div>
+  </body>
+</html>

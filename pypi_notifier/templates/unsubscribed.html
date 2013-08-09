@@ -1,5 +1,6 @@
 {% extends "layout.html" %}
 
 {% block body %}
-  You are unsubscribed. <a href="{{ url_for('index') }}">Got to home page.</a>
+  <p class="lead">You are unsubscribed.</p>
+  <p class="offset"><a class="btn btn-primary" href="{{ url_for('index') }}">&laquo; Back to index</a></p>
 {% endblock %}

@@ -2,16 +2,20 @@
 
 {% block body %}
   <h1>Done.</h1>
+  <p class="lead">You will be notified via email when a requirement is updated for your selected repos.</p>
 
   {% if reqs %}
-  Here is the list of updated requirements as far as we know.<br><br>
+  <p>Here is the list of updated requirements as far as we know.</p>
   {% include 'update_list.html' %}
   {% endif %}
-  <br>
-  You will be notified via email when a requirement is updated for your selected repos.
-  <br><br>
-  Go somewhere else now:
-  <ul>
-    <li><a href="http://www.reddit.com/r/python">r/python</a></li>
-  </ul>
+
+  <p>
+    Go somewhere else now:
+    <ul>
+      <li><a href="http://www.reddit.com/r/python">r/python</a></li>
+    </ul>
+  </p>
+  <p class="offset">
+    <a href={{ url_for('index') }} class="btn btn-primary">&laquo; Back to index</a>
+  </p>
 {% endblock %}
