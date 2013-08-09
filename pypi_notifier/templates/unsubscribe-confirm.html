@@ -1,13 +1,9 @@
 {% extends "layout.html" %}
 
 {% block body %}
-  Are you sure?
-  <form method=post>
-    <input type="radio" name="confirm" value="yes" id="yes">
-    <label for="yes">Yes</label>
-    <input type="radio" name="confirm" value="no" id="no" checked>
-    <label for="no">No</label>
-    <br>
-    <button type="submit">Confirm</button>
+  <p class="lead">Are you sure?</p>
+  <form method="POST">
+    <button class="btn btn-primary" type="submit" name="confirm" value="no">No, keep my subscription</button>
+    <button class="btn btn-danger" type="submit" name="confirm" value="yes">Yes, unsubscribe me</button>
   </form>
 {% endblock %}
