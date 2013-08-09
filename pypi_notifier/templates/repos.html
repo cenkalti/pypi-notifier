@@ -1,10 +1,12 @@
 {% extends "layout.html" %}
 
 {% block body %}
-  Select the repositories that you want to be notified when a requirement is
-  updated.
-  <form method=post>
-    <ul style="list-style: none">
+  <p class="lead">
+    Select the repositories that you want to be notified when a requirement is
+    updated:
+  </p>
+  <form method="POST">
+    <ul class="list-unstyled">
       {% for repo in repos %}
         <li>
           <input type="checkbox", {{ "checked" if repo.checked else "" }}
@@ -14,6 +16,8 @@
         </li>
       {% endfor %}
     </ul>
-    <button type="submit">Next</button>
+    <p class="offset">
+      <button class="btn btn-primary" type="submit">Next &raquo;</button>
+    </p>
   </form>
 {% endblock %}

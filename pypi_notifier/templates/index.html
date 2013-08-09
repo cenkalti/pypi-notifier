@@ -1,32 +1,27 @@
 {% extends "layout.html" %}
 
 {% block body %}
+<div class="jumbotron">
   <h1>Welcome</h1>
-
-  <p>PyPI Notifier watches your projects' requirements.txt files and
+  <p class="lead"><span class="text-info">PyPI Notifier</span> watches your projects' <span class="text-info">requirements.txt</span> files and
   emails you when a required package is updated.</p>
-
   {% if g.user %}
-    Hello {{ g.user.name }}. Your registered email is: {{ g.user.email }}
-
-    <nav>
-      <ul>
-        <li><a href={{ url_for('repos') }}>Select Repos</a></li>
-        <li><a href={{ url_for('logout') }}>Logout</a></li>
-        <li><a href={{ url_for('unsubscribe') }}>Unsubscribe</a></li>
-      </ul>
-    </nav>
-
+    <p>
+      <small>
+        Hello, {{ g.user.name }}!<br>
+        Your registered email is: {{ g.user.email }}
+      </small>
+    </p>
+    <p>
+      <a href={{ url_for('repos') }} class="btn btn-default">Select Repos</a>
+      <a href={{ url_for('logout') }} class="btn btn-default">Logout</a>
+      <a href={{ url_for('unsubscribe') }} class="btn btn-default">Unsubscribe</a>
+    </p>
   {% else %}
-    <ul>
-      <li>
-        <a href={{ url_for('login') }}
-          >Login with your GitHub account (public repos only)</a>
-      </li>
-      <li>
-        <a href={{ url_for('login', private=True) }}
-          >Login with your GitHub account (public and private repos)</a>
-      </li>
-    </ul>
+    <p>
+      <a href={{ url_for('login') }} class="btn btn-success btn-large">Login with your GitHub account<br><small>(public repos only)</small></a>
+      <a href={{ url_for('login', private=True) }} class="btn btn-success btn-large">Login with your GitHub account<br><small>(public and private repos)<small></a>
+    </p>
   {% endif %}
+</div>
 {% endblock %}
