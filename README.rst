@@ -14,26 +14,18 @@ with::
 
     pip install -r requirements.txt
 
-Configuration
--------------
-
-Copy ``config.example.py`` as ``config.py`` and fill the values.
-
-Running Web Server
-------------------
+Running
+-------
 
 Web server is run with `gevent <http://www.gevent.org/>`_.
 There is a script for running the web server::
 
-    ./run_gevent.py
+    ./run_gevent.py development
 
 Flask development server can be run with the following command::
 
     ./manage.py runserver
 
-Running Jobs
-----------------------
+This task is run by scheduler hourly to send emails::
 
-This script is run by cron::
-
-    ./run_jobs.sh
+    ./manage.py --config development hourly
