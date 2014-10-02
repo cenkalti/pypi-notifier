@@ -35,6 +35,5 @@ class heroku(object):
         self.SQLALCHEMY_DATABASE_URI = os.environ['HEROKU_POSTGRESQL_COPPER_URL']
         self.GITHUB_CLIENT_ID = os.environ['GITHUB_CLIENT_ID']
         self.GITHUB_CLIENT_SECRET = os.environ['GITHUB_CLIENT_SECRET']
-        self.GITHUB_CALLBACK_URL = os.environ['GITHUB_CALLBACK_URL']
         self.SENTRY_DSN = os.environ['SENTRY_DSN']
         self.POSTMARK_APIKEY = os.environ['POSTMARK_APIKEY']
