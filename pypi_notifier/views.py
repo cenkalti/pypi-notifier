@@ -9,12 +9,12 @@ from pypi_notifier.models import Repo
 def register_views(app):
 
     @app.route('/user')
-    def user():
+    def get_user():
         return str(github.get('user'))
 
     @app.route('/repos')
-    def repos():
-        repos = github.get('user/repos')
+    def get_repos():
+        repos = github.get('user/repos', params={'per_page': '100'})
         repos = with_organization_repos(repos)
         selected_ids = [r.github_id for r in g.user.repos]
         for repo in repos:

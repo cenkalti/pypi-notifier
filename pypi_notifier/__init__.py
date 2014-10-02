@@ -47,7 +47,7 @@ def create_app(config):
     @app.route('/github-callback')
     @github.authorized_handler
     def oauth_authorized(token):
-        next_url = request.args.get('next') or url_for('repos')
+        next_url = request.args.get('next') or url_for('get_repos')
 
         if token is None:
             flash('You denied the request to sign in.')
@@ -87,7 +87,7 @@ def create_app(config):
 
             g.user.email = selected
             db.session.commit()
-            return redirect(url_for('repos'))
+            return redirect(url_for('get_repos'))
         return render_template("select-email.html", emails=emails)
 
     @app.route('/')
