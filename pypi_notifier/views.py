@@ -22,7 +22,7 @@ def register_views(app):
         for repo in repos:
             repo['checked'] = (repo['id'] in selected_ids)
         # list only python projects
-        repos = [r for r in repos if r.language.lower() == 'python']
+        repos = [r for r in repos if r['language'].lower() == 'python']
         return render_template('repos.html', repos=repos)
 
     def with_organization_repos(repos):
