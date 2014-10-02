@@ -5,6 +5,8 @@ from flask import render_template, request, redirect, url_for, g
 from pypi_notifier import db, github
 from pypi_notifier.models import Repo
 
+list_params = {'per_page': '100', 'language': 'Python'}
+
 
 def register_views(app):
 
@@ -14,7 +16,7 @@ def register_views(app):
 
     @app.route('/repos')
     def get_repos():
-        repos = github.get('user/repos', params={'per_page': '100'})
+        repos = github.get('user/repos', params=list_params)
         repos = with_organization_repos(repos)
         selected_ids = [r.github_id for r in g.user.repos]
         for repo in repos:
@@ -26,7 +28,8 @@ def register_views(app):
         orgs = github.get('user/orgs')
         orgs_names = [o['login'] for o in orgs]
         for org_name in orgs_names:
-            org_repos = github.get('orgs/%s/repos' % org_name)
+            org_repos = github.get('orgs/%s/repos' % org_name,
+                                   params=list_params)
             for repo in org_repos:
                 all_repos[repo['id']] = repo  # add each repo for each org.
 
