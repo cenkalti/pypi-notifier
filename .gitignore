@@ -1,1 +1,2 @@
 *.pyc
+pypi_notifier/pypi_notifier.db

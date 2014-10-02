@@ -1,6 +1,4 @@
 #!/usr/bin/env python
-import os
-import errno
 import logging
 from functools import wraps
 
@@ -11,16 +9,6 @@ from pypi_notifier import create_app, db, models, cache, sentry
 
 
 logging.basicConfig(level=logging.DEBUG)
-
-
-try:
-    # Must be a class name from config.py
-    config = os.environ['PYPI_NOTIFIER_CONFIG']
-except KeyError:
-    print "PYPI_NOTIFIER_CONFIG is not found in env, using DevelopmentConfig."
-    print 'If you want to use another config please set it as ' \
-          '"export PYPI_NOTIFIER_CONFIG=ProductionConfig".'
-    config = 'DevelopmentConfig'
 
 
 class Manager(flask.ext.script.Manager):
@@ -44,8 +32,7 @@ def catch_exception(f):
 
 
 manager = Manager(create_app)
-manager.add_option('-c', '--config', dest='config', required=False,
-                   default=config)
+manager.add_option('-c', '--config', dest='config', required=True)
 
 
 @manager.shell
@@ -56,15 +43,6 @@ def make_shell_context():
 @manager.command
 def init_db():
     db.create_all()
-
-
-@manager.command
-def drop_db():
-    try:
-        os.unlink('/tmp/pypi_notifier.db')
-    except OSError as e:
-        if e.errno != errno.ENOENT:
-            raise
 
 
 @manager.command
@@ -95,6 +73,13 @@ def update_packages():
 @manager.command
 def send_emails():
     models.User.send_emails()
+
+
+@manager.command
+def hourly():
+    update_repos()
+    update_packages()
+    send_emails()
 
 
 if __name__ == '__main__':
