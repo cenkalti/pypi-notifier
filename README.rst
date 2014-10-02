@@ -4,7 +4,7 @@ PyPI Notifier
 http://www.pypi-notifier.org
 
 Watches your ``requirements.txt`` files and notifies you via email when
-a project is updated.
+a requirement is updated.
 
 .. image:: https://travis-ci.org/cenkalti/pypi-notifier.svg?branch=master
     :target: https://travis-ci.org/cenkalti/pypi-notifier
@@ -12,7 +12,7 @@ a project is updated.
 Requirements
 ------------
 
-Python 2.7 is required to run PyPI Notifier. Install the project dependencies
+Python 2.7 is required to run PyPI Notifier. Install the project's dependencies
 with::
 
     pip install -r requirements.txt
