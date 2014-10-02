@@ -5,7 +5,7 @@ from flask import render_template, request, redirect, url_for, g
 from pypi_notifier import db, github
 from pypi_notifier.models import Repo
 
-list_params = {'per_page': '100', 'language': 'Python'}
+list_params = {'per_page': '100'}
 
 
 def register_views(app):
@@ -21,6 +21,8 @@ def register_views(app):
         selected_ids = [r.github_id for r in g.user.repos]
         for repo in repos:
             repo['checked'] = (repo['id'] in selected_ids)
+        # list only python projects
+        repos = [r for r in repos if r.language.lower() == 'python']
         return render_template('repos.html', repos=repos)
 
     def with_organization_repos(repos):
