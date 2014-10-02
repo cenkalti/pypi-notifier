@@ -6,6 +6,9 @@ http://www.pypi-notifier.org
 Watches your ``requirements.txt`` files and notifies you via email when
 a project is updated.
 
+.. image:: https://travis-ci.org/cenkalti/pypi-notifier.svg?branch=master
+    :target: https://travis-ci.org/cenkalti/pypi-notifier
+
 Requirements
 ------------
 
