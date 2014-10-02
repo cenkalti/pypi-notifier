@@ -5,13 +5,12 @@ from flask.ext.github import GitHub
 
 from pypi_notifier import create_app, db
 from pypi_notifier.models import User, Repo, Requirement, Package
-from pypi_notifier.config import TestingConfig
 
 
 class PyPINotifierTestCase(unittest.TestCase):
 
     def setUp(self):
-        self.app = create_app(TestingConfig)
+        self.app = create_app("testing")
         self.client = self.app.test_client()
         self._ctx = self.app.test_request_context()
         self._ctx.push()

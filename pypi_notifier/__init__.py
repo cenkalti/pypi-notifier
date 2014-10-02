@@ -125,5 +125,5 @@ def create_app(config):
 def load_config(app, object_or_str):
     from pypi_notifier import config
     if isinstance(object_or_str, basestring):
-        object_or_str = getattr(config, object_or_str)
+        object_or_str = getattr(config, object_or_str)()
     app.config.from_object(object_or_str)
