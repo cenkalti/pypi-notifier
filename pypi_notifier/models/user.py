@@ -18,7 +18,7 @@ class User(db.Model, ModelMixin):
     name = db.Column(db.String(200))
     email = db.Column(db.String(200), nullable=False)
     github_id = db.Column(db.Integer, unique=True)
-    github_token = db.Column(db.Integer, unique=True)
+    github_token = db.Column(db.String(40), unique=True)
     email_sent_at = db.Column(db.DateTime)
 
     repos = db.relationship('Repo', backref='user',

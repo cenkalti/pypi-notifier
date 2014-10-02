@@ -13,6 +13,7 @@ greenlet==0.4.1
 ipython==0.13.2
 itsdangerous==0.24
 mock==1.0.1
+newrelic==2.32.0.28
 psycopg2==2.5.4
 pystmark==0.3.3
 python-memcached==1.53
