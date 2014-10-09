@@ -19,6 +19,6 @@ psycopg2==2.5.4
 pystmark==0.4.4
 python-memcached==1.53
 raven==5.0.0
-requests==2.4.1
+requests==2.4.3
 verlib==0.1
 wsgiref==0.1.2
