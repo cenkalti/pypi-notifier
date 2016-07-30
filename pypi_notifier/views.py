@@ -21,8 +21,6 @@ def register_views(app):
         selected_ids = [r.github_id for r in g.user.repos]
         for repo in repos:
             repo['checked'] = (repo['id'] in selected_ids)
-        # list only python projects
-        repos = [r for r in repos if str(r.get('language')).lower() == 'python']
         return render_template('repos.html', repos=repos)
 
     def with_organization_repos(repos):
