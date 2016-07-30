@@ -22,7 +22,7 @@ class Package(db.Model, ModelMixin):
 
     repos = association_proxy('requirements', 'repo')
 
-    pypi = xmlrpclib.ServerProxy('http://pypi.python.org/pypi')
+    pypi = xmlrpclib.ServerProxy('https://pypi.python.org/pypi')
 
     def __init__(self, name):
         self.name = name.lower()
