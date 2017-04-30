@@ -7,14 +7,13 @@ from sqlalchemy.ext.associationproxy import association_proxy
 from pypi_notifier import db, github
 from pypi_notifier.models.user import User
 from pypi_notifier.models.package import Package
-from pypi_notifier.models.mixin import ModelMixin
 from pypi_notifier.models.util import ignored
 
 
 logger = logging.getLogger(__name__)
 
 
-class Repo(db.Model, ModelMixin):
+class Repo(db.Model):
     __tablename__ = 'repos'
     __table_args__ = (
         UniqueConstraint('user_id', 'github_id'),
@@ -70,8 +69,18 @@ class Repo(db.Model, ModelMixin):
 
     def add_new_requirement(self, name, specs):
         from pypi_notifier.models.requirement import Requirement
-        package = Package.get_or_create(name=name)
-        requirement = Requirement.get_or_create(repo=self, package=package)
+        package = db.session.query(Package).filter(Package.name == name).first()
+        if not package:
+            package = Package(name=name)
+            db.session.add(package)
+            db.session.flush([package])
+
+        requirement = db.session.query(Requirement).filter(
+                Requirement.repo_id == self.id,
+                Requirement.package_id == package.id).first()
+        if not requirement:
+            requirement = Requirement(repo=self, package=package)
+
         requirement.specs = specs
         self.requirements.append = requirement
 
@@ -90,15 +99,13 @@ class Repo(db.Model, ModelMixin):
         if self.last_modified:
             headers = {'If-Modified-Since': self.last_modified}
 
-        params = {'access_token': self.user.github_token}
-        response = github.raw_request('GET', path,
-                                      headers=headers, params=params)
+        response = github.raw_request('GET', path, headers=headers, access_token=self.user.github_token)
         logger.debug("Response: %s", response)
         if response.status_code == 200:
             self.last_modified = response.headers['Last-Modified']
             response = response.json()
             if response['encoding'] == 'base64':
-                return base64.b64decode(response['content'])
+                return base64.b64decode(response['content']).decode('utf-8', 'replace')
             else:
                 raise Exception("Unknown encoding: %s" % response['encoding'])
         elif response.status_code == 304:  # Not modified

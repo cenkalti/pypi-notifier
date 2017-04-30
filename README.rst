@@ -12,7 +12,7 @@ a requirement is updated.
 Requirements
 ------------
 
-Python 2.7 is required to run PyPI Notifier. Install the project's dependencies
+Python 3 is required to run PyPI Notifier. Install the project's dependencies
 with::
 
     pip install -r requirements.txt

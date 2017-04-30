@@ -21,7 +21,7 @@ def register_views(app):
     @app.route('/repos', methods=['POST'])
     def post_repos():
         # Add selected repos
-        for name, github_id in request.form.iteritems():
+        for name, github_id in request.form.items():
             github_id = int(github_id)
             repo = Repo.query.filter(
                 Repo.github_id == github_id,
@@ -32,7 +32,7 @@ def register_views(app):
             db.session.add(repo)
 
         # Remove unselected repos
-        ids = map(int, request.form.itervalues())
+        ids = set(map(int, request.form.values()))
         for repo in g.user.repos:
             if repo.github_id not in ids:
                 db.session.delete(repo)

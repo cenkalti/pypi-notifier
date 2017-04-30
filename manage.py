@@ -2,7 +2,7 @@
 import logging
 from functools import wraps
 
-import flask.ext.script
+import flask_script
 from flask import current_app
 
 from pypi_notifier import create_app, db, models, cache, sentry
@@ -11,7 +11,7 @@ from pypi_notifier import create_app, db, models, cache, sentry
 logging.basicConfig(level=logging.DEBUG)
 
 
-class Manager(flask.ext.script.Manager):
+class Manager(flask_script.Manager):
     """Subclassed to send exception information to Senry on command errors."""
     def command(self, func):
         func = catch_exception(func)
@@ -57,7 +57,7 @@ def clear_cache():
 
 @manager.command
 def find_latest(name):
-    print models.Package(name).find_latest_version()
+    print(models.Package(name).find_latest_version())
 
 
 @manager.command

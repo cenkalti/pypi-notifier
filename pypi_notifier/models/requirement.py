@@ -3,14 +3,13 @@ from verlib import NormalizedVersion as Version, IrrationalVersionError
 from pypi_notifier import db
 from pypi_notifier.models.repo import Repo
 from pypi_notifier.models.package import Package
-from pypi_notifier.models.mixin import ModelMixin
 from pypi_notifier.models.util import JSONType
 
 
 logger = logging.getLogger(__name__)
 
 
-class Requirement(db.Model, ModelMixin):
+class Requirement(db.Model):
     __tablename__ = 'requirements'
 
     repo_id = db.Column(db.Integer,

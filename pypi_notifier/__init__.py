@@ -1,8 +1,9 @@
-from flask import Flask, g, session, request, url_for, redirect, flash, \
-    render_template, abort
-from flask.ext.cache import Cache
-from flask.ext.github import GitHub, GitHubError
-from flask.ext.sqlalchemy import SQLAlchemy
+import warnings
+
+from flask import Flask, g, session, request, url_for, redirect, flash, render_template, abort
+from flask_cache import Cache
+from flask_github import GitHub, GitHubError
+from flask_sqlalchemy import SQLAlchemy
 from raven.contrib.flask import Sentry
 
 
@@ -18,6 +19,7 @@ def create_app(config):
 
     app = Flask(__name__)
     load_config(app, config)
+    warnings.simplefilter(app.config['WARNINGS'])
 
     db.init_app(app)
     cache.init_app(app)
@@ -51,9 +53,9 @@ def create_app(config):
 
         if token is None:
             flash('You denied the request to sign in.')
-            return redirect(next_url)
+            return redirect('/')
 
-        user_response = github.get('user', params={'access_token': token})
+        user_response = github.get('user', access_token=token)
         github_id = user_response['id']
         user = User.query.filter_by(github_token=token).first()
         if user is None:
@@ -124,6 +126,6 @@ def create_app(config):
 
 def load_config(app, object_or_str):
     from pypi_notifier import config
-    if isinstance(object_or_str, basestring):
+    if isinstance(object_or_str, str):
         object_or_str = getattr(config, object_or_str)()
     app.config.from_object(object_or_str)

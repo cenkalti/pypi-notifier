@@ -4,14 +4,13 @@ import pystmark
 from flask import render_template, current_app
 from sqlalchemy import or_
 from pypi_notifier import db, github
-from pypi_notifier.models.mixin import ModelMixin
 from pypi_notifier.models.util import ignored
 
 
 logger = logging.getLogger(__name__)
 
 
-class User(db.Model, ModelMixin):
+class User(db.Model):
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -45,7 +44,7 @@ class User(db.Model, ModelMixin):
         users = cls.query.filter(
             or_(
                 cls.email_sent_at <= datetime.utcnow() - timedelta(days=7),
-                cls.email_sent_at == None
+                cls.email_sent_at.is_(None),
             )
         ).all()
         for user in users:

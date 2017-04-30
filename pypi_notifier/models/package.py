@@ -1,17 +1,16 @@
 import logging
-import xmlrpclib
+import xmlrpc.client
 from datetime import datetime, timedelta
 from sqlalchemy import or_
 from sqlalchemy.ext.associationproxy import association_proxy
 from pypi_notifier import db, cache
-from pypi_notifier.models.mixin import ModelMixin
 from pypi_notifier.models.util import ignored
 
 
 logger = logging.getLogger(__name__)
 
 
-class Package(db.Model, ModelMixin):
+class Package(db.Model):
     __tablename__ = 'packages'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -22,7 +21,7 @@ class Package(db.Model, ModelMixin):
 
     repos = association_proxy('requirements', 'repo')
 
-    pypi = xmlrpclib.ServerProxy('https://pypi.python.org/pypi')
+    pypi = xmlrpc.client.ServerProxy('https://pypi.python.org/pypi')
 
     def __init__(self, name):
         self.name = name.lower()
@@ -39,7 +38,7 @@ class Package(db.Model, ModelMixin):
         packages = cls.query.filter(
             or_(
                 cls.last_check <= datetime.utcnow() - timedelta(days=1),
-                cls.last_check == None
+                cls.last_check.is_(None),
             )
         ).all()
         for package in packages:
@@ -51,8 +50,7 @@ class Package(db.Model, ModelMixin):
     @cache.cached(timeout=3600, key_prefix='all_packages')
     def get_all_names(cls):
         packages = cls.pypi.list_packages()
-        packages = filter(None, packages)
-        return {name.lower(): name for name in packages}
+        return {name.lower(): name for name in packages if name}
 
     @property
     def original_name(self):
