@@ -75,3 +75,17 @@ class User(db.Model, ModelMixin):
         headers = {'Accept': 'application/vnd.github.v3'}
         emails = github.get('user/emails', params=params, headers=headers)
         return [e for e in emails if e['verified']]
+
+    def get_repos_from_github(self):
+        all_repos = []
+        page = 1
+        while True:
+            params = {'per_page': '100', 'page': str(page)}
+            repos = github.get('user/repos', params=params)
+            if not repos:
+                break
+
+            all_repos.extend(repos)
+            page += 1
+
+        return all_repos

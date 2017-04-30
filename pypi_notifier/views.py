@@ -3,8 +3,6 @@ from flask import render_template, request, redirect, url_for, g
 from pypi_notifier import db, github
 from pypi_notifier.models import Repo
 
-list_params = {'per_page': '100'}
-
 
 def register_views(app):
 
@@ -14,7 +12,7 @@ def register_views(app):
 
     @app.route('/repos')
     def get_repos():
-        repos = github.get('user/repos', params=list_params)
+        repos = g.user.get_repos_from_github()
         selected_ids = [r.github_id for r in g.user.repos]
         for repo in repos:
             repo['checked'] = (repo['id'] in selected_ids)
