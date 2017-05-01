@@ -1,4 +1,4 @@
-import unittest
+from unittest import TestCase
 from unittest.mock import patch
 
 from flask.ext.github import GitHub
@@ -8,7 +8,7 @@ from pypi_notifier.extensions import db
 from pypi_notifier.models import User, Repo, Requirement, Package
 
 
-class PyPINotifierTestCase(unittest.TestCase):
+class PyPINotifierTestCase(TestCase):
 
     def setUp(self):
         self.app = create_app("testing")
@@ -109,7 +109,3 @@ class PyPINotifierTestCase(unittest.TestCase):
         from pypi_notifier.models.repo import strip_requirements
         s = strip_requirements(s)
         assert s == 'django\ncelery'
-
-
-if __name__ == '__main__':
-    unittest.main()
