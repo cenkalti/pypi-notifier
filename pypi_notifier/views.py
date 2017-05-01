@@ -1,14 +1,27 @@
-from flask import render_template, request, redirect, url_for, g
+from flask import render_template, request, redirect, url_for, g, abort
 
-from pypi_notifier.extensions import db, github
+from pypi_notifier.extensions import db
 from pypi_notifier.models import Repo
 
 
 def register_views(app):
 
-    @app.route('/user')
-    def get_user():
-        return str(github.get('user'))
+    @app.route('/')
+    def index():
+        return render_template('index.html')
+
+    @app.route('/select-email', methods=['GET', 'POST'])
+    def select_email():
+        emails = g.user.get_emails_from_github()
+        if request.method == 'POST':
+            selected = request.form['email']
+            if selected not in [e['email'] for e in emails]:
+                abort(400)
+
+            g.user.email = selected
+            db.session.commit()
+            return redirect(url_for('get_repos'))
+        return render_template("select-email.html", emails=emails)
 
     @app.route('/repos')
     def get_repos():

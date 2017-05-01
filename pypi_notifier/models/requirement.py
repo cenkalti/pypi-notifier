@@ -12,20 +12,12 @@ logger = logging.getLogger(__name__)
 class Requirement(db.Model):
     __tablename__ = 'requirements'
 
-    repo_id = db.Column(db.Integer,
-                        db.ForeignKey(Repo.id),
-                        primary_key=True)
-    package_id = db.Column(db.Integer,
-                           db.ForeignKey(Package.id),
-                           primary_key=True)
+    repo_id = db.Column(db.Integer, db.ForeignKey(Repo.id), primary_key=True)
+    package_id = db.Column(db.Integer, db.ForeignKey(Package.id), primary_key=True)
     specs = db.Column(JSONType())
 
-    package = db.relationship(
-        Package,
-        backref=db.backref('requirements', cascade='all, delete-orphan'))
-    repo = db.relationship(
-        Repo,
-        backref=db.backref('requirements', cascade="all, delete-orphan"))
+    package = db.relationship(Package, backref=db.backref('requirements', cascade='all, delete-orphan'))
+    repo = db.relationship(Repo, backref=db.backref('requirements', cascade="all, delete-orphan"))
 
     def __init__(self, repo, package, specs=None):
         self.repo = repo
@@ -33,8 +25,7 @@ class Requirement(db.Model):
         self.specs = specs
 
     def __repr__(self):
-        return "<Requirement: %s requires %s with %s>" % (
-            self.repo.name, self.package.name, self.specs)
+        return "<Requirement: %s requires %s with %s>" % (self.repo.name, self.package.name, self.specs)
 
     @property
     def required_version(self):
@@ -53,8 +44,7 @@ class Requirement(db.Model):
         try:
             return Version(self.required_version) == Version(latest_version)
         except IrrationalVersionError:
-            return poor_mans_version_compare(self.required_version,
-                                             latest_version)
+            return poor_mans_version_compare(self.required_version, latest_version)
 
 
 def poor_mans_version_compare(v1, v2):

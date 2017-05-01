@@ -1,6 +1,6 @@
 import warnings
 
-from flask import Flask, g, session, request, url_for, redirect, flash, render_template, abort
+from flask import Flask, g, session, request, url_for, redirect, flash, render_template
 from flask_github import GitHubError
 
 from .extensions import db, cache, github, sentry
@@ -43,11 +43,9 @@ def create_app(config):
     @app.route('/github-callback')
     @github.authorized_handler
     def oauth_authorized(token):
-        next_url = request.args.get('next') or url_for('get_repos')
-
         if token is None:
             flash('You denied the request to sign in.')
-            return redirect('/')
+            return redirect(url_for('index'))
 
         user_response = github.get('user', access_token=token)
         github_id = user_response['id']
@@ -71,36 +69,19 @@ def create_app(config):
         if len(emails) > 1:
             return redirect(url_for('select_email'))
         else:
-            return redirect(next_url)
-
-    @app.route('/select-email', methods=['GET', 'POST'])
-    def select_email():
-        emails = g.user.get_emails_from_github()
-        if request.method == 'POST':
-            selected = request.form['email']
-            if selected not in [e['email'] for e in emails]:
-                abort(400)
-
-            g.user.email = selected
-            db.session.commit()
             return redirect(url_for('get_repos'))
-        return render_template("select-email.html", emails=emails)
-
-    @app.route('/')
-    def index():
-        return render_template('index.html')
 
     @app.route('/login')
     def login():
-        if session.get('user_id', None) is None or g.user is None:
-            if request.args.get('private') == 'True':
-                scope = 'user:email,repo'
-            else:
-                scope = 'user:email'
-
-            return github.authorize(scope=scope)
-        else:
+        if g.user and session.get('user_id'):
             return redirect(url_for('index'))
+
+        if request.args.get('private') == 'True':
+            scope = 'user:email,repo'
+        else:
+            scope = 'user:email'
+
+        return github.authorize(scope=scope)
 
     @app.route('/logout')
     def logout():

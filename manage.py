@@ -5,7 +5,9 @@ from functools import wraps
 import flask_script
 from flask import current_app
 
-from pypi_notifier import create_app, db, models, cache, sentry
+from pypi_notifier.app import create_app
+from pypi_notifier import models
+from pypi_notifier.extensions import db, cache, sentry
 
 
 logging.basicConfig(level=logging.DEBUG)

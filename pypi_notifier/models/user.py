@@ -20,8 +20,7 @@ class User(db.Model):
     github_token = db.Column(db.String(40), unique=True)
     email_sent_at = db.Column(db.DateTime)
 
-    repos = db.relationship('Repo', backref='user',
-                            cascade="all, delete-orphan")
+    repos = db.relationship('Repo', backref='user', cascade="all, delete-orphan")
 
     def __init__(self, github_token):
         self.github_token = github_token
@@ -63,8 +62,7 @@ class User(db.Model):
                 to=self.email,
                 subject="There are updated packages in PyPI",
                 html=html)
-            response = pystmark.send(message,
-                                     current_app.config['POSTMARK_APIKEY'])
+            response = pystmark.send(message, current_app.config['POSTMARK_APIKEY'])
             response.raise_for_status()
         else:
             logger.info("No outdated requirement.")

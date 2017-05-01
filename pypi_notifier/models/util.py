@@ -29,12 +29,6 @@ class JSONType(TypeDecorator):
 
 @contextmanager
 def ignored(*exceptions):
-    """Context manager to ignore specifed exceptions
-
-         with ignored(OSError):
-             os.remove(somefile)
-
-    """
     try:
         yield
     except exceptions:
