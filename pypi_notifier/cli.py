@@ -34,6 +34,6 @@ def register_commands(app):
 
     @app.cli.command()
     def hourly():
-        update_repos()
-        update_packages()
-        send_emails()
+        models.Repo.update_all_repos()
+        models.Package.update_all_packages()
+        models.User.send_emails()
