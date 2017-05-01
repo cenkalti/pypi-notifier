@@ -88,17 +88,21 @@ class Repo(db.Model):
 
     def parse_requirements_file(self):
         contents = self.fetch_requirements()
-        if contents:
-            contents = strip_requirements(contents)
-            if contents:
-                try:
-                    requirements = parse_requirements(contents)
-                except RequirementParseError as e:
-                    logger.warning("parsing error for %s: %s", self.name, e)
-                    return
+        if not contents:
+            return
 
-                for req in requirements:
-                    yield req.project_name.lower(), req.specs
+        contents = strip_requirements(contents)
+        if not contents:
+            return
+
+        try:
+            requirements = parse_requirements(contents)
+        except RequirementParseError as e:
+            logger.warning("parsing error for %s: %s", self.name, e)
+            return
+
+        for req in requirements:
+            yield req.project_name.lower(), req.specs
 
     def fetch_requirements(self):
         logger.info("Fetching requirements of repo: %s", self)
