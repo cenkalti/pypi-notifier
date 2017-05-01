@@ -1,7 +1,7 @@
 import warnings
 
 from flask import Flask, g, session, request, url_for, redirect, flash, render_template, abort
-from flask_cache import Cache
+from flask_caching import Cache
 from flask_github import GitHub, GitHubError
 from flask_sqlalchemy import SQLAlchemy
 from raven.contrib.flask import Sentry
