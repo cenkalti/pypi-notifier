@@ -23,7 +23,7 @@ class PyPINotifierTestCase(unittest.TestCase):
 
     def test_index(self):
         rv = self.client.get('/')
-        assert 'Login' in rv.data
+        assert 'Login' in rv.data.decode()
 
     def test_login(self):
         rv = self.client.get('/login')
