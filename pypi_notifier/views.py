@@ -1,6 +1,6 @@
 from flask import render_template, request, redirect, url_for, g
 
-from pypi_notifier import db, github
+from pypi_notifier.extensions import db, github
 from pypi_notifier.models import Repo
 
 

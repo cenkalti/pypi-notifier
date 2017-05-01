@@ -4,7 +4,7 @@ from datetime import datetime
 from pkg_resources import parse_requirements
 from sqlalchemy import UniqueConstraint
 from sqlalchemy.ext.associationproxy import association_proxy
-from pypi_notifier import db, github
+from pypi_notifier.extensions import db, github
 from pypi_notifier.models.user import User
 from pypi_notifier.models.package import Package
 from pypi_notifier.models.util import ignored

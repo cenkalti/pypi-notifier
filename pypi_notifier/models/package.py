@@ -3,7 +3,7 @@ import xmlrpc.client
 from datetime import datetime, timedelta
 from sqlalchemy import or_
 from sqlalchemy.ext.associationproxy import association_proxy
-from pypi_notifier import db, cache
+from pypi_notifier.extensions import db, cache
 from pypi_notifier.models.util import ignored
 
 

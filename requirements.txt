@@ -7,7 +7,7 @@ Flask-Caching==1.2.0
 Flask-Script==2.0.5
 Flask-SQLAlchemy==2.2
 gevent==1.2.1
-GitHub-Flask==3.1.7
+-e git+git@github.com:cenkalti/github-flask.git@b793e9de3a2ece4fcaa14458d2f588dfdd2b5ba2#egg=GitHub_Flask
 greenlet==0.4.12
 itsdangerous==0.24
 Jinja2==2.9.6

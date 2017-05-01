@@ -3,7 +3,8 @@ import unittest
 from mock import patch
 from flask.ext.github import GitHub
 
-from pypi_notifier import create_app, db
+from pypi_notifier.app import create_app
+from pypi_notifier.extensions import db
 from pypi_notifier.models import User, Repo, Requirement, Package
 
 

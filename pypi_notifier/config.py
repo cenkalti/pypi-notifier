@@ -43,3 +43,9 @@ class heroku(object):
         self.SENTRY_DSN = os.environ['SENTRY_DSN']
         self.POSTMARK_APIKEY = os.environ['POSTMARK_APIKEY']
         self.WARNINGS = 'default'
+
+
+def load_config(config_object, object_or_str):
+    if isinstance(object_or_str, str):
+        object_or_str = globals()[object_or_str]()
+    config_object.from_object(object_or_str)

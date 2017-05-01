@@ -5,7 +5,7 @@ from contextlib import contextmanager
 
 from sqlalchemy.types import TypeDecorator, Text
 
-from pypi_notifier import db
+from pypi_notifier.extensions import db
 
 
 logger = logging.getLogger(__name__)

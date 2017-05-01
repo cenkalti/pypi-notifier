@@ -1,6 +1,6 @@
 import logging
 from verlib import NormalizedVersion as Version, IrrationalVersionError
-from pypi_notifier import db
+from pypi_notifier.extensions import db
 from pypi_notifier.models.repo import Repo
 from pypi_notifier.models.package import Package
 from pypi_notifier.models.util import JSONType

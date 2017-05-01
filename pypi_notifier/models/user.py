@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 import pystmark
 from flask import render_template, current_app
 from sqlalchemy import or_
-from pypi_notifier import db, github
+from pypi_notifier.extensions import db, github
 from pypi_notifier.models.util import ignored
 
 
