@@ -46,6 +46,7 @@ class Repo(db.Model):
             with commit_or_rollback():
                 if not repo.user:
                     db.session.delete(repo)
+                    continue
                 repo.update_requirements()
 
     def update_requirements(self):
