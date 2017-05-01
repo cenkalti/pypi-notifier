@@ -44,6 +44,8 @@ class Repo(db.Model):
         repos = cls.query.all()
         for repo in repos:
             with commit_or_rollback():
+                if not repo.user:
+                    db.session.delete(repo)
                 repo.update_requirements()
 
     def update_requirements(self):
