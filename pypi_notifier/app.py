@@ -1,5 +1,3 @@
-import warnings
-
 from flask import Flask, g, session, request, url_for, redirect, flash, render_template
 from flask_github import GitHubError
 
@@ -13,7 +11,6 @@ def create_app(config):
 
     app = Flask(__name__)
     load_config(app.config, config)
-    warnings.simplefilter(app.config['WARNINGS'])
 
     db.init_app(app)
     cache.init_app(app)

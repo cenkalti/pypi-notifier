@@ -12,7 +12,6 @@ class development(object):
         self.GITHUB_CLIENT_SECRET = ''
         self.SQLALCHEMY_DATABASE_URI = 'sqlite:///pypi_notifier.db'
         self.SQLALCHEMY_TRACK_MODIFICATIONS = False
-        self.WARNINGS = 'error'
 
 
 class testing(object):
@@ -26,7 +25,6 @@ class testing(object):
         self.GITHUB_CLIENT_SECRET = 'b'
         self.SQLALCHEMY_DATABASE_URI = 'sqlite:////tmp/pypi_notifier.db'
         self.SQLALCHEMY_TRACK_MODIFICATIONS = False
-        self.WARNINGS = 'error'
 
 
 class heroku(object):
@@ -42,7 +40,6 @@ class heroku(object):
         self.GITHUB_CLIENT_SECRET = os.environ['GITHUB_CLIENT_SECRET']
         self.SENTRY_DSN = os.environ['SENTRY_DSN']
         self.POSTMARK_APIKEY = os.environ['POSTMARK_APIKEY']
-        self.WARNINGS = 'default'
 
 
 def load_config(config_object, object_or_str):
