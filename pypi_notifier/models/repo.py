@@ -1,7 +1,7 @@
 import base64
 import logging
 from datetime import datetime
-from pkg_resources import parse_requirements
+from pkg_resources import parse_requirements, RequirementParseError
 from sqlalchemy import UniqueConstraint
 from sqlalchemy.ext.associationproxy import association_proxy
 from pypi_notifier.extensions import db, github
@@ -91,7 +91,13 @@ class Repo(db.Model):
         if contents:
             contents = strip_requirements(contents)
             if contents:
-                for req in parse_requirements(contents):
+                try:
+                    requirements = parse_requirements(contents)
+                except RequirementParseError as e:
+                    logger.warning("parsing error for %s: %s", self.name, e)
+                    return
+
+                for req in requirements:
                     yield req.project_name.lower(), req.specs
 
     def fetch_requirements(self):
