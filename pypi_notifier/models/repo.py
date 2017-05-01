@@ -7,7 +7,7 @@ from sqlalchemy.ext.associationproxy import association_proxy
 from pypi_notifier.extensions import db, github
 from pypi_notifier.models.user import User
 from pypi_notifier.models.package import Package
-from pypi_notifier.models.util import ignored
+from pypi_notifier.models.util import commit_or_rollback
 
 
 logger = logging.getLogger(__name__)
@@ -43,9 +43,8 @@ class Repo(db.Model):
     def update_all_repos(cls):
         repos = cls.query.all()
         for repo in repos:
-            with ignored(Exception):
+            with commit_or_rollback():
                 repo.update_requirements()
-                db.session.commit()
 
     def update_requirements(self):
         """

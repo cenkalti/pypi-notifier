@@ -4,7 +4,7 @@ import pystmark
 from flask import render_template, current_app
 from sqlalchemy import or_
 from pypi_notifier.extensions import db, github
-from pypi_notifier.models.util import ignored
+from pypi_notifier.models.util import commit_or_rollback
 
 
 logger = logging.getLogger(__name__)
@@ -47,11 +47,10 @@ class User(db.Model):
             )
         ).all()
         for user in users:
-            with ignored(Exception):
+            with commit_or_rollback():
                 logger.info(user)
                 user.send_email()
                 user.email_sent_at = datetime.utcnow()
-                db.session.commit()
 
     def send_email(self):
         outdateds = self.get_outdated_requirements()

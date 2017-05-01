@@ -28,9 +28,10 @@ class JSONType(TypeDecorator):
 
 
 @contextmanager
-def ignored(*exceptions):
+def commit_or_rollback():
     try:
         yield
-    except exceptions:
+        db.session.commit()
+    except Exception:
         db.session.rollback()
         logger.error(''.join(traceback.format_exc()))

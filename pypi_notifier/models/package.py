@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from sqlalchemy import or_
 from sqlalchemy.ext.associationproxy import association_proxy
 from pypi_notifier.extensions import db, cache
-from pypi_notifier.models.util import ignored
+from pypi_notifier.models.util import commit_or_rollback
 
 
 logger = logging.getLogger(__name__)
@@ -42,9 +42,8 @@ class Package(db.Model):
             )
         ).all()
         for package in packages:
-            with ignored(Exception):
+            with commit_or_rollback():
                 package.update_from_pypi()
-                db.session.commit()
 
     @classmethod
     @cache.cached(timeout=3600, key_prefix='all_packages')
