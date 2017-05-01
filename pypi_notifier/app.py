@@ -3,12 +3,12 @@ from flask_github import GitHubError
 
 from .extensions import db, cache, github, sentry
 from .config import load_config
+from .views import register_views
+from .cli import register_commands
+from .models import User
 
 
 def create_app(config):
-    from pypi_notifier.views import register_views
-    from pypi_notifier.models import User
-
     app = Flask(__name__)
     load_config(app.config, config)
 
@@ -19,6 +19,7 @@ def create_app(config):
         sentry.init_app(app)
 
     register_views(app)
+    register_commands(app)
 
     @app.before_request
     def set_user():
