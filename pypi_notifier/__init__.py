@@ -1,16 +1,9 @@
 import warnings
 
 from flask import Flask, g, session, request, url_for, redirect, flash, render_template, abort
-from flask_caching import Cache
-from flask_github import GitHub, GitHubError
-from flask_sqlalchemy import SQLAlchemy
-from raven.contrib.flask import Sentry
+from flask_github import GitHubError
 
-
-db = SQLAlchemy()
-cache = Cache()
-github = GitHub()
-sentry = Sentry()
+from .extensions import db, cache, github, sentry
 
 
 def create_app(config):
