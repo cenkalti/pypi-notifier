@@ -96,7 +96,7 @@ class Repo(db.Model):
             return
 
         try:
-            requirements = parse_requirements(contents)
+            requirements = list(parse_requirements(contents))
         except RequirementParseError as e:
             logger.warning("parsing error for %s: %s", self.name, e)
             return
