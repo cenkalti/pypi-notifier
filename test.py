@@ -1,6 +1,6 @@
 import unittest
+from unittest.mock import patch
 
-from mock import patch
 from flask.ext.github import GitHub
 
 from pypi_notifier.app import create_app
