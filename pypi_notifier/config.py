@@ -31,7 +31,7 @@ class heroku(object):
     def __init__(self):
         self.SECRET_KEY = os.environ['SECRET_KEY']
         self.CACHE_TYPE = 'redis'
-        self.REDIS_URL = os.environ['REDIS_URL']
+        self.CACHE_REDIS_URL = os.environ['REDIS_URL']
         self.SQLALCHEMY_DATABASE_URI = os.environ['HEROKU_POSTGRESQL_COPPER_URL']
         self.SQLALCHEMY_TRACK_MODIFICATIONS = False
         self.GITHUB_CLIENT_ID = os.environ['GITHUB_CLIENT_ID']
