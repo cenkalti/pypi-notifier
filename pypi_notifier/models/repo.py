@@ -55,17 +55,25 @@ class Repo(db.Model):
         parses the file and adds each requirement to the repo.
 
         """
-        for project_name, specs in self.parse_requirements_file():
+        tracked_packages = set()
+        for package_name, specs in self.parse_requirements_file():
             # specs may be empty list if no version is specified in file
             # No need to add to table since we can't check updates.
             if specs:
                 # There must be '==' operator in specs.
                 operators = [s[0] for s in specs]
                 if '==' in operators:
+                    package_name = package_name.lower()
                     # If the project is not registered on PyPI,
                     # we are not adding it.
-                    if project_name.lower() in Package.get_all_names():
-                        self.add_new_requirement(project_name, specs)
+                    if package_name in Package.get_all_names():
+                        tracked_packages.add(package_name)
+                        self.add_new_requirement(package_name, specs)
+
+        # Delete removed requirements
+        for req in list(self.requirements):
+            if req.package.name not in tracked_packages:
+                self.requirements.remove(req)
 
         self.last_check = datetime.utcnow()
 
