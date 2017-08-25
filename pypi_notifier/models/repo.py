@@ -13,6 +13,18 @@ from pypi_notifier.models.util import commit_or_rollback
 logger = logging.getLogger(__name__)
 
 
+class RequirementsNotModified(Exception):
+    pass
+
+
+class RequirementsNotFound(Exception):
+    pass
+
+
+class InvalidToken(Exception):
+    pass
+
+
 class Repo(db.Model):
     __tablename__ = 'repos'
     __table_args__ = (
@@ -47,16 +59,42 @@ class Repo(db.Model):
                 if not repo.user:
                     db.session.delete(repo)
                     continue
+
                 repo.update_requirements()
 
-    def update_requirements(self):
+    def update_requirements(self, force=False):
         """
         Fetches the content of the requirements.txt files from GitHub,
         parses the file and adds each requirement to the repo.
 
         """
+        self._update_requirements(force=force)
+        self.last_check = datetime.utcnow()
+
+    def _update_requirements(self, force=False):
+        try:
+            content = self.fetch_requirements(force=force)
+        except RequirementsNotModified:
+            logger.info("requirements.txt file not modified")
+            return
+        except RequirementsNotFound:
+            logger.info("requirements.txt file not found")
+            self.requirements.clear()
+            return
+        except InvalidToken:
+            logger.info("invalid token, deleting user: %s", self.user.name)
+            db.session.delete(self.user)
+            return
+
+        try:
+            requirements = Repo.parse_requirements_file(content)
+        except RequirementParseError as e:
+            logger.warning("parsing error for %s: %s", self.name, e)
+            self.requirements.clear()
+            return
+
         tracked_packages = set()
-        for package_name, specs in self.parse_requirements_file():
+        for package_name, specs in requirements:
             # specs may be empty list if no version is specified in file
             # No need to add to table since we can't check updates.
             if specs:
@@ -75,8 +113,6 @@ class Repo(db.Model):
             if req.package.name not in tracked_packages:
                 self.requirements.remove(req)
 
-        self.last_check = datetime.utcnow()
-
     def add_new_requirement(self, name, specs):
         from pypi_notifier.models.requirement import Requirement
         package = db.session.query(Package).filter(Package.name == name).first()
@@ -94,29 +130,20 @@ class Repo(db.Model):
         requirement.specs = specs
         self.requirements.append = requirement
 
-    def parse_requirements_file(self):
-        contents = self.fetch_requirements()
-        if not contents:
-            return
-
+    @staticmethod
+    def parse_requirements_file(contents):
         contents = strip_requirements(contents)
         if not contents:
-            return
+            return []
 
-        try:
-            requirements = list(parse_requirements(contents))
-        except RequirementParseError as e:
-            logger.warning("parsing error for %s: %s", self.name, e)
-            return
-
-        for req in requirements:
+        for req in parse_requirements(contents):
             yield req.project_name.lower(), req.specs
 
-    def fetch_requirements(self):
+    def fetch_requirements(self, force=False):
         logger.info("Fetching requirements of repo: %s", self)
         path = 'repos/%s/contents/requirements.txt' % self.name
         headers = None
-        if self.last_modified:
+        if not force and self.last_modified:
             headers = {'If-Modified-Since': self.last_modified}
 
         response = github.raw_request('GET', path, headers=headers, access_token=self.user.github_token)
@@ -124,21 +151,18 @@ class Repo(db.Model):
         if response.status_code == 200:
             self.last_modified = response.headers['Last-Modified']
             response = response.json()
-            if response['encoding'] == 'base64':
-                return base64.b64decode(response['content']).decode('utf-8', 'replace')
-            else:
-                raise Exception("Unknown encoding: %s" % response['encoding'])
+            if response['encoding'] != 'base64':
+                raise ValueError("Unknown encoding: %s" % response['encoding'])
+
+            return base64.b64decode(response['content']).decode('utf-8', 'replace')
         elif response.status_code == 304:  # Not modified
-            return None
+            raise RequirementsNotModified
         elif response.status_code == 401:
-            # User's token is not valid. Let's delete the user.
-            db.session.delete(self.user)
+            raise InvalidToken
         elif response.status_code == 404:
-            # requirements.txt file is not found.
-            # Remove the repo so we won't check it again.
-            db.session.delete(self)
-        else:
-            raise Exception("Unknown status code: %s" % response.status_code)
+            raise RequirementsNotFound
+
+        raise Exception("Unknown status code: %s" % response.status_code)
 
 
 def strip_requirements(s):
