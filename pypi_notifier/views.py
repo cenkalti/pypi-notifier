@@ -10,6 +10,10 @@ def register_views(app):
     def index():
         return render_template('index.html')
 
+    @app.route('/robots.txt')
+    def robots_txt():
+        return 'User-agent: *\nAllow: /'
+
     @app.route('/select-email', methods=['GET', 'POST'])
     def select_email():
         emails = g.user.get_emails_from_github()
