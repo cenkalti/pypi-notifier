@@ -12,3 +12,4 @@ redis==2.10.5
 requests==2.13.0
 SQLAlchemy==1.1.9
 verlib==0.1
+blinker==1.4
