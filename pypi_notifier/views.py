@@ -29,10 +29,13 @@ def register_views(app):
 
     @app.route('/repos')
     def get_repos():
+        user_repos = {r.github_id: r for r in g.user.repos}
         repos = g.user.get_repos_from_github()
-        selected_ids = [r.github_id for r in g.user.repos]
         for repo in repos:
-            repo['checked'] = (repo['id'] in selected_ids)
+            user_repo = user_repos.get(repo['id'])
+            if user_repo:
+                repo['checked'] = True
+                repo['requirements_path'] = user_repo.requirements_path
         return render_template('repos.html', repos=repos)
 
     @app.route('/repos', methods=['POST'])
