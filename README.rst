@@ -20,6 +20,8 @@ with::
 Running
 -------
 
+First, add your Github client credentials into development config in `config.py`.
+
 Web server is run with `gevent <http://www.gevent.org/>`_.
 There is a script for running the web server::
 
@@ -27,8 +29,11 @@ There is a script for running the web server::
 
 Flask development server can be run with the following command::
 
-    ./manage.py runserver
+    source devenv.sh
+    flask init-db
+    flask run
 
-This task is run by scheduler hourly to send emails::
+An hourly task is run by scheduler hourly to send emails::
 
-    ./manage.py --config development hourly
+    source devenv.sh
+    flask hourly
