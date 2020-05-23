@@ -2,17 +2,21 @@
 
 {% block body %}
   <p class="lead">
-    Select the repositories that you want to be notified when a requirement is
-    updated:
+    Select the repositories that you want to be notified when a requirement is updated.
+  </p>
+  <p class="lead">
+    You can also specify custom path for requirements.txt file.
   </p>
   <form method="POST">
     <ul class="list-unstyled">
       {% for repo in repos %}
         <li>
           <input type="checkbox", {{ "checked" if repo.checked else "" }}
-                 name="{{ repo.full_name }}" value="{{ repo.id }}"
+                 name="repo:{{ repo.id }}" value="{{ repo.full_name }}"
                  id="{{ repo.id }}">
           <label for="{{ repo.id }}">{{ repo.full_name }}</label>
+          <input type=text placeholder="/requirements.txt"
+                 name="path:{{ repo.id }}" value="{{ repo.requirements_path }}">
         </li>
       {% endfor %}
     </ul>

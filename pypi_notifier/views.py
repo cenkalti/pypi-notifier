@@ -38,18 +38,31 @@ def register_views(app):
     @app.route('/repos', methods=['POST'])
     def post_repos():
         # Add selected repos
-        for name, github_id in request.form.items():
-            github_id = int(github_id)
-            repo = Repo.query.filter(
-                Repo.github_id == github_id,
-                Repo.user_id == g.user.id).first()
-            if repo is None:
-                repo = Repo(github_id, g.user)
-            repo.name = name
-            db.session.add(repo)
+        repos = {}
+        for name, value in request.form.items():
+            prefix, name = name.split(':', 1)
+            if prefix == 'repo':
+                github_id = int(name)
+                repo = Repo.query.filter(
+                    Repo.github_id == github_id,
+                    Repo.user_id == g.user.id).first()
+                if repo is None:
+                    repo = Repo(github_id, g.user)
+                repo.name = value
+                db.session.add(repo)
+                repos[github_id] = repo
+
+        # Set requirements.txt paths
+        for name, value in request.form.items():
+            prefix, name = name.split(':', 1)
+            if prefix == 'path':
+                github_id = int(name)
+                repo = repos.get(github_id)
+                if repo:
+                    repo.requirements_path = value
 
         # Remove unselected repos
-        ids = set(map(int, request.form.values()))
+        ids = set(map(int, repos.keys()))
         for repo in g.user.repos:
             if repo.github_id not in ids:
                 db.session.delete(repo)

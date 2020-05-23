@@ -35,6 +35,7 @@ class Repo(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey(User.id))
     github_id = db.Column(db.Integer)
     name = db.Column(db.String(200))
+    requirements_path = db.Column(db.String(2000))
     last_check = db.Column(db.DateTime)
     last_modified = db.Column(db.String(40))
 
@@ -141,7 +142,8 @@ class Repo(db.Model):
 
     def fetch_requirements(self, force=False):
         logger.info("Fetching requirements of repo: %s", self)
-        path = 'repos/%s/contents/requirements.txt' % self.name
+        requirements_path = self.requirements_path or 'requirements.txt'
+        path = 'repos/%s/contents/%s' % (self.name, requirements_path.lstrip('/'))
         headers = None
         if not force and self.last_modified:
             headers = {'If-Modified-Since': self.last_modified}
