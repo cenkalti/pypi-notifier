@@ -39,7 +39,8 @@ class Requirement(db.Model):
     def up_to_date(self):
         latest_version = self.package.latest_version
         if not latest_version:
-            raise Exception("Latest version of the package is unknown.")
+            # Package not found in PyPI. Might be deleted.
+            return False
 
         try:
             return Version(self.required_version) == Version(latest_version)
