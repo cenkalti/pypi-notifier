@@ -53,12 +53,18 @@ class Package(db.Model):
 
     @property
     def original_name(self):
-        return self.get_all_names()[self.name.lower()]
+        try:
+            return self.get_all_names()[self.name.lower()]
+        except KeyError:
+            return self.name
 
     def find_latest_version(self):
-        version = self.pypi.package_releases(self.original_name)[0]
-        logger.info("Latest version of %s is %s", self.original_name, version)
-        return version
+        all_releases = self.pypi.package_releases(self.original_name)
+        if not all_releases:
+            return
+        latest_version = all_releases[0]
+        logger.info("Latest version of %s is %s", self.original_name, latest_version)
+        return latest_version
 
     def update_from_pypi(self):
         """
