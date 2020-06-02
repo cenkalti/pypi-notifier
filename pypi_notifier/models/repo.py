@@ -153,6 +153,8 @@ class Repo(db.Model):
         if response.status_code == 200:
             self.last_modified = response.headers['Last-Modified']
             response = response.json()
+            if isinstance(response, list):  # path is directory
+                raise RequirementsNotFound
             if response['encoding'] != 'base64':
                 raise ValueError("Unknown encoding: %s" % response['encoding'])
 
