@@ -49,8 +49,18 @@ class User(db.Model):
         for user in users:
             with commit_or_rollback():
                 logger.info(user)
-                user.send_email()
-                user.email_sent_at = datetime.utcnow()
+                try:
+                    user.send_email()
+                except pystmark.UnprocessableEntityError as e:
+                    if e.error_code == 406:
+                        logger.info("%s mail address is supressed. Removing user...")
+                        # You tried to send to a recipient that has been marked as inactive.
+                        # Inactive recipients are ones that have generated a hard bounce, a spam complaint, or a manual suppression.
+                        db.session.delete(user)
+                    else:
+                        raise
+                else:
+                    user.email_sent_at = datetime.utcnow()
 
     def send_email(self):
         outdateds = self.get_outdated_requirements()
