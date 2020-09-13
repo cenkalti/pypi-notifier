@@ -43,7 +43,16 @@ class Package(db.Model):
         ).all()
         for package in packages:
             with commit_or_rollback():
-                package.update_from_pypi()
+                try:
+                    package.update_from_pypi()
+                except xmlrpc.client.Fault as exc:
+                    if 'HTTPTooManyRequests' in exc.faultString:
+                        wait = 60
+                        logger.error('Too many requests to PyPI, waiting %d seconds before retry', wait)
+                        time.sleep(wait)
+                        package.update_from_pypi()
+                    else:
+                        raise
 
     @classmethod
     @cache.cached(timeout=3600, key_prefix='all_packages')
