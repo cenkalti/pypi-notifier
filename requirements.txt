@@ -2,7 +2,7 @@ Flask==1.1.2
 Flask-Caching==1.8.0
 flask-shell-ptpython==1.0.2
 Flask-SQLAlchemy==2.4.1
-gevent==20.5.0
+gevent==20.9.0
 GitHub-Flask==3.2.0
 psycopg2==2.8.5
 pystmark==0.4.8
