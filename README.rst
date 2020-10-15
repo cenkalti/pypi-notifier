@@ -22,18 +22,23 @@ Running
 
 First, add your Github client credentials into development config in `config.py`.
 
+Then, set your config env var in your shell::
+
+    export PYPI_NOTIFIER_CONFIG=development
+
+Create necessary tables for the application::
+
+    flask init-db
+
 Web server is run with `gevent <http://www.gevent.org/>`_.
 There is a script for running the web server::
 
-    ./run_gevent.py development
+    ./run_gevent.py
 
 Flask development server can be run with the following command::
 
-    source devenv.sh
-    flask init-db
     flask run
 
-An hourly task is run by scheduler hourly to send emails::
+An hourly task is run by a scheduler to send emails::
 
-    source devenv.sh
     flask hourly
