@@ -10,6 +10,8 @@ from pypi_notifier.models.util import commit_or_rollback
 
 logger = logging.getLogger(__name__)
 
+pypi = xmlrpc.client.ServerProxy('https://pypi.python.org/pypi')
+
 
 class Package(db.Model):
     __tablename__ = 'packages'
@@ -21,8 +23,6 @@ class Package(db.Model):
     last_check = db.Column(db.DateTime)
 
     repos = association_proxy('requirements', 'repo')
-
-    pypi = xmlrpc.client.ServerProxy('https://pypi.python.org/pypi')
 
     def __init__(self, name):
         self.name = name.lower()
