@@ -58,7 +58,7 @@ class Package(db.Model):
     @classmethod
     @cache.cached(timeout=3600, key_prefix='all_packages')
     def get_all_names(cls):
-        packages = cls.pypi.list_packages()
+        packages = pypi.list_packages()
         return {name.lower(): name for name in packages if name}
 
     @property
@@ -69,7 +69,7 @@ class Package(db.Model):
             return self.name
 
     def find_latest_version(self):
-        all_releases = self.pypi.package_releases(self.original_name)
+        all_releases = pypi.package_releases(self.original_name)
         if not all_releases:
             return
         latest_version = all_releases[0]
