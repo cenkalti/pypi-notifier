@@ -33,6 +33,7 @@ class heroku(object):
         self.CACHE_TYPE = 'redis'
         self.CACHE_REDIS_URL = os.environ['REDIS_URL']
         self.SQLALCHEMY_DATABASE_URI = os.environ['HEROKU_POSTGRESQL_COPPER_URL']
+        self.SQLALCHEMY_DATABASE_URI = self.SQLALCHEMY_DATABASE_URI.replace("postgres://", "postgresql://")
         self.SQLALCHEMY_TRACK_MODIFICATIONS = False
         self.GITHUB_CLIENT_ID = os.environ['GITHUB_CLIENT_ID']
         self.GITHUB_CLIENT_SECRET = os.environ['GITHUB_CLIENT_SECRET']
