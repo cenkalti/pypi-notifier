@@ -9,7 +9,7 @@ export class PypiStack extends cdk.Stack {
 
     new lambdaPython.PythonFunction(this, 'Function', {
       runtime: lambda.Runtime.PYTHON_3_8, // required
-      entry: 'lambda', // required
+      entry: 'pypi_notifier', // required
       index: 'hello.py', // optional, defaults to 'index.py'
       handler: 'handler', // optional, defaults to 'handler'
     })
