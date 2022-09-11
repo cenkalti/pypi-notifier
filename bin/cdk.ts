@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 import * as cdk from 'aws-cdk-lib'
-import { CdkStack } from '../lib/cdk-stack'
+import { PypiStack } from '../lib/pypi-stack'
 
 const app = new cdk.App()
-new CdkStack(app, 'CdkStack', {
+new PypiStack(app, 'PypiNotifierStack', {
 
   env: { account: '821523470585', region: 'us-east-1' },
 
