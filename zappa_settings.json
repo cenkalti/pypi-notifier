@@ -1,0 +1,21 @@
+{
+    "dev": {
+        "app_function": "app.app",
+        "aws_region": "us-east-1",
+        "profile_name": "default",
+        "project_name": "pypi-notifier",
+        "runtime": "python3.9",
+        "s3_bucket": "zappa-x01w7cnk0",
+        "manage_roles": true,
+        "environment_variables": {
+            "PYPI_NOTIFIER_CONFIG": "production",
+            "SECRET_KEY": "SECRET_KEY",
+            "SQLALCHEMY_DATABASE_URI": "",
+            "SQLALCHEMY_TRACK_MODIFICATIONS": "",
+            "GITHUB_CLIENT_ID": "",
+            "GITHUB_CLIENT_SECRET": "",
+            "SENTRY_DSN": "",
+            "POSTMARK_APIKEY": ""
+        }
+    }
+}
