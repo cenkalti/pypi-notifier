@@ -1,5 +1,5 @@
 {
-    "dev": {
+    "production": {
         "app_function": "app.app",
         "aws_region": "us-east-1",
         "profile_name": "default",
@@ -8,14 +8,15 @@
         "s3_bucket": "zappa-x01w7cnk0",
         "manage_roles": true,
         "environment_variables": {
-            "PYPI_NOTIFIER_CONFIG": "production",
-            "SECRET_KEY": "SECRET_KEY",
-            "SQLALCHEMY_DATABASE_URI": "",
-            "SQLALCHEMY_TRACK_MODIFICATIONS": "",
-            "GITHUB_CLIENT_ID": "",
-            "GITHUB_CLIENT_SECRET": "",
-            "SENTRY_DSN": "",
-            "POSTMARK_APIKEY": ""
-        }
+            "PYPI_NOTIFIER_CONFIG": "production"
+        },
+        "aws_environment_variables": {
+            "AWS_SYSTEMS_MANAGER_PARAM_STORE_PATH": "/pypi-notifier/production"
+        },
+        "extra_permissions": [{
+            "Effect": "Allow",
+            "Action": ["ssm:GetParametersByPath"],
+            "Resource": "arn:aws:ssm:us-east-1:821523470585:parameter/pypi-notifier/*"
+        }]
     }
 }
