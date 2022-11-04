@@ -1,3 +1,7 @@
+import os
+from urllib.parse import urlparse, urlunparse
+
+import boto3
 from flask import Flask, g, session, request, url_for, redirect, flash, render_template
 from flask_github import GitHubError
 
@@ -6,6 +10,20 @@ from .config import load_config
 from .views import register_views
 from .cli import register_commands
 from .models import User
+
+
+def populate_environ_from_ssm():
+    ssm_param_path = os.getenv('AWS_SYSTEMS_MANAGER_PARAM_STORE_PATH')
+    if not ssm_param_path:
+        return
+    client = boto3.client('ssm')
+    response = client.get_parameters_by_path(Path=ssm_param_path, WithDecryption=True)
+    for param in response['Parameters']:
+        env_name = os.path.basename(param['Name'])
+        os.environ[env_name] = param['Value']
+
+
+populate_environ_from_ssm()
 
 
 def create_app(config):
@@ -20,6 +38,15 @@ def create_app(config):
 
     register_views(app)
     register_commands(app)
+
+    @app.before_request
+    def redirect_nonwww():
+        """Redirect non-www requests to www."""
+        urlparts = urlparse(request.url)
+        if urlparts.netloc == 'pypi-notifier.org':
+            urlparts_list = list(urlparts)
+            urlparts_list[1] = 'www.pypi-notifier.org'
+            return redirect(urlunparse(urlparts_list), code=301)
 
     @app.before_request
     def set_user():
