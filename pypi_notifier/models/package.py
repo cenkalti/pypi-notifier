@@ -1,4 +1,3 @@
-import time
 import logging
 import xmlrpc.client
 from datetime import datetime, timedelta
@@ -42,18 +41,20 @@ class Package(db.Model):
                 cls.last_check.is_(None),
             )
         ).all()
+        logger.info("Number of packages to be processed: %s", len(packages))
+        total = 0
         for package in packages:
-            with commit_or_rollback():
-                try:
-                    package.update_from_pypi()
-                except xmlrpc.client.Fault as exc:
-                    if 'HTTPTooManyRequests' in exc.faultString:
-                        wait = 60
-                        logger.error('Too many requests to PyPI, waiting %d seconds before retry', wait)
-                        time.sleep(wait)
-                        package.update_from_pypi()
-                    else:
-                        raise
+            try:
+                package.update_from_pypi()
+            except xmlrpc.client.Fault as exc:
+                if 'HTTPTooManyRequests' in exc.faultString:
+                    logger.error(exc.faultString)
+                    return
+                else:
+                    raise
+
+        logger.info("Number of packages processed: %s", total)
+        db.session.commit()
 
     @classmethod
     @cache.cached(timeout=3600, key_prefix='all_packages')

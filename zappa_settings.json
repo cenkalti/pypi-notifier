@@ -20,6 +20,23 @@
             "Effect": "Allow",
             "Action": ["ssm:GetParametersByPath"],
             "Resource": "arn:aws:ssm:us-east-1:821523470585:parameter/pypi-notifier/*"
-        }]
+        }],
+        "events": [
+            {
+                "enabled": true,
+                "function": "app.update_repos",
+                "expression": "rate(1 hour)"
+            },
+            {
+                "enabled": true,
+                "function": "app.update_packages",
+                "expression": "rate(1 minute)"
+            },
+            {
+                "enabled": true,
+                "function": "app.send_emails",
+                "expression": "rate(1 day)"
+            }
+        ]
     }
 }
