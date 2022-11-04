@@ -1,4 +1,5 @@
 import os
+from urllib.parse import urlparse, urlunparse
 
 import boto3
 from flask import Flask, g, session, request, url_for, redirect, flash, render_template
@@ -37,6 +38,15 @@ def create_app(config):
 
     register_views(app)
     register_commands(app)
+
+    @app.before_request
+    def redirect_nonwww():
+        """Redirect non-www requests to www."""
+        urlparts = urlparse(request.url)
+        if urlparts.netloc == 'pypi-notifier.org':
+            urlparts_list = list(urlparts)
+            urlparts_list[1] = 'www.pypi-notifier.org'
+            return redirect(urlunparse(urlparts_list), code=301)
 
     @app.before_request
     def set_user():
