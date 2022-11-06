@@ -10,7 +10,6 @@
         "route53_enabled": false,
         "s3_bucket": "zappa-x01w7cnk0",
         "log_level": "INFO",
-        "manage_roles": true,
         "environment_variables": {
             "PYPI_NOTIFIER_CONFIG": "production"
         },
