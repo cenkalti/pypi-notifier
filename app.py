@@ -30,4 +30,4 @@ def handler(signum, stack):
 
 
 signal.signal(signal.SIGALRM, handler)
-signal.alarm(45)
+signal.alarm(850)

@@ -10,7 +10,7 @@
         "route53_enabled": false,
         "s3_bucket": "zappa-x01w7cnk0",
         "log_level": "INFO",
-        "timeout_seconds": 50,
+        "timeout_seconds": 900,
         "environment_variables": {
             "PYPI_NOTIFIER_CONFIG": "production"
         },
