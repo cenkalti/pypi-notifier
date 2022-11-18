@@ -1,4 +1,7 @@
 import os
+import time
+import signal
+import traceback
 
 from pypi_notifier import models
 from pypi_notifier.app import create_app
@@ -19,3 +22,12 @@ def update_packages():
 def send_emails():
     with app.app_context():
         models.User.send_emails()
+
+
+def handler(signum, stack):
+    print('Alarm: ', time.ctime())
+    traceback.print_stack()
+
+
+signal.signal(signal.SIGALRM, handler)
+signal.alarm(45)
