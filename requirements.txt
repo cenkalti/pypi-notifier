@@ -1,4 +1,4 @@
-Flask==2.2.2
+Flask==2.3.2
 Flask-Caching==2.0.1
 flask-shell-ptpython==1.0.2
 Flask-SQLAlchemy==2.5.1
