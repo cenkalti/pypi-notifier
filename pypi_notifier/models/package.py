@@ -1,6 +1,6 @@
 import logging
 from datetime import datetime, timedelta
-from typing import Optional
+from typing import List, Optional
 
 import requests
 from sqlalchemy import or_
@@ -82,7 +82,7 @@ class Package(db.Model):
             self.updated_at = datetime.utcnow()
 
 
-def pypi_get_project_names() -> list[str]:
+def pypi_get_project_names() -> List[str]:
     headers = {"Accept": "application/vnd.pypi.simple.v1+json"}
     response = requests.get("https://pypi.org/simple/", headers=headers)
     response.raise_for_status()
