@@ -1,14 +1,15 @@
 import base64
 import logging
 from datetime import datetime
-from pkg_resources import parse_requirements, RequirementParseError
+
+from pkg_resources import RequirementParseError, parse_requirements
 from sqlalchemy import UniqueConstraint
 from sqlalchemy.ext.associationproxy import association_proxy
-from pypi_notifier.extensions import db, github
-from pypi_notifier.models.user import User
-from pypi_notifier.models.package import Package
-from pypi_notifier.models.util import commit_or_rollback
 
+from pypi_notifier.extensions import db, github
+from pypi_notifier.models.package import Package
+from pypi_notifier.models.user import User
+from pypi_notifier.models.util import commit_or_rollback
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +28,10 @@ class InvalidToken(Exception):
 
 class Repo(db.Model):
     __tablename__ = "repos"
-    __table_args__ = (UniqueConstraint("user_id", "github_id"),)
+    __table_args__ = (
+        UniqueConstraint("user_id", "github_id"),
+        {"extend_existing": True},
+    )
 
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey(User.id))

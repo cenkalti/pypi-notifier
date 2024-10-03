@@ -1,17 +1,19 @@
 import logging
 from datetime import datetime, timedelta
+
 import pystmark
-from flask import render_template, current_app
+from flask import current_app, render_template
 from sqlalchemy import or_
+
 from pypi_notifier.extensions import db, github
 from pypi_notifier.models.util import commit_or_rollback
-
 
 logger = logging.getLogger(__name__)
 
 
 class User(db.Model):
     __tablename__ = "users"
+    __table_args__ = {"extend_existing": True}
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200))

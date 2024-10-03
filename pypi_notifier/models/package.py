@@ -1,5 +1,6 @@
 import logging
 from datetime import datetime, timedelta
+from typing import Optional
 
 import requests
 from sqlalchemy import or_
@@ -13,6 +14,7 @@ logger = logging.getLogger(__name__)
 
 class Package(db.Model):
     __tablename__ = "packages"
+    __table_args__ = {"extend_existing": True}
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200), unique=True)
@@ -87,7 +89,7 @@ def pypi_get_project_names() -> list[str]:
     return [project["name"] for project in response.json()["projects"]]
 
 
-def pypi_get_latest_version(project: str) -> str | None:
+def pypi_get_latest_version(project: str) -> Optional[str]:
     headers = {"Accept": "application/vnd.pypi.simple.v1+json"}
     response = requests.get(f"https://pypi.org/simple/{project}/", headers=headers)
     response.raise_for_status()
