@@ -1,7 +1,7 @@
 import logging
-import xmlrpc.client
 from datetime import datetime, timedelta
 
+import requests
 from sqlalchemy import or_
 from sqlalchemy.ext.associationproxy import association_proxy
 
@@ -9,8 +9,6 @@ from pypi_notifier.extensions import cache, db
 from pypi_notifier.models.util import commit_or_rollback
 
 logger = logging.getLogger(__name__)
-
-pypi = xmlrpc.client.ServerProxy("https://pypi.python.org/pypi")
 
 
 class Package(db.Model):
@@ -53,7 +51,7 @@ class Package(db.Model):
     @classmethod
     @cache.cached(timeout=3600, key_prefix="all_packages")
     def get_all_names(cls):
-        packages = pypi.list_packages()
+        packages = pypi_get_project_names()
         return {name.lower(): name for name in packages if name}
 
     @property
@@ -64,10 +62,9 @@ class Package(db.Model):
             return self.name
 
     def find_latest_version(self):
-        all_releases = pypi.package_releases(self.original_name)
-        if not all_releases:
+        latest_version = pypi_get_latest_version(self.original_name)
+        if not latest_version:
             return
-        latest_version = all_releases[0]
         logger.info("Latest version of %s is %s", self.original_name, latest_version)
         return latest_version
 
@@ -81,3 +78,20 @@ class Package(db.Model):
         if self.latest_version != latest:
             self.latest_version = latest
             self.updated_at = datetime.utcnow()
+
+
+def pypi_get_project_names() -> list[str]:
+    headers = {"Accept": "application/vnd.pypi.simple.v1+json"}
+    response = requests.get("https://pypi.org/simple/", headers=headers)
+    response.raise_for_status()
+    return [project["name"] for project in response.json()["projects"]]
+
+
+def pypi_get_latest_version(project: str) -> str | None:
+    headers = {"Accept": "application/vnd.pypi.simple.v1+json"}
+    response = requests.get(f"https://pypi.org/simple/{project}/", headers=headers)
+    response.raise_for_status()
+    try:
+        return response.json()["versions"][-1]
+    except IndexError:
+        return
