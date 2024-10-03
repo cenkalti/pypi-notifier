@@ -13,14 +13,14 @@ from .models import User
 
 
 def populate_environ_from_ssm():
-    ssm_param_path = os.getenv('AWS_SYSTEMS_MANAGER_PARAM_STORE_PATH')
+    ssm_param_path = os.getenv("AWS_SYSTEMS_MANAGER_PARAM_STORE_PATH")
     if not ssm_param_path:
         return
-    client = boto3.client('ssm')
+    client = boto3.client("ssm")
     response = client.get_parameters_by_path(Path=ssm_param_path, WithDecryption=True)
-    for param in response['Parameters']:
-        env_name = os.path.basename(param['Name'])
-        os.environ[env_name] = param['Value']
+    for param in response["Parameters"]:
+        env_name = os.path.basename(param["Name"])
+        os.environ[env_name] = param["Value"]
 
 
 populate_environ_from_ssm()
@@ -33,7 +33,7 @@ def create_app(config):
     db.init_app(app)
     cache.init_app(app)
     github.init_app(app)
-    if app.config.get('SENTRY_DSN'):
+    if app.config.get("SENTRY_DSN"):
         sentry.init_app(app)
 
     register_views(app)
@@ -43,16 +43,16 @@ def create_app(config):
     def redirect_nonwww():
         """Redirect non-www requests to www."""
         urlparts = urlparse(request.url)
-        if urlparts.netloc == 'pypi-notifier.org':
+        if urlparts.netloc == "pypi-notifier.org":
             urlparts_list = list(urlparts)
-            urlparts_list[1] = 'www.pypi-notifier.org'
+            urlparts_list[1] = "www.pypi-notifier.org"
             return redirect(urlunparse(urlparts_list), code=301)
 
     @app.before_request
     def set_user():
         g.user = None
-        if session.get('user_id', None):
-            g.user = User.query.get(session['user_id'])
+        if session.get("user_id", None):
+            g.user = User.query.get(session["user_id"])
 
     @app.after_request
     def remove_session(response):
@@ -65,15 +65,15 @@ def create_app(config):
         if user is not None:
             return user.github_token
 
-    @app.route('/github-callback')
+    @app.route("/github-callback")
     @github.authorized_handler
     def oauth_authorized(token):
         if token is None:
-            flash('You denied the request to sign in.')
-            return redirect(url_for('index'))
+            flash("You denied the request to sign in.")
+            return redirect(url_for("index"))
 
-        user_response = github.get('user', access_token=token)
-        github_id = user_response['id']
+        user_response = github.get("user", access_token=token)
+        github_id = user_response["id"]
         user = User.query.filter_by(github_token=token).first()
         if user is None:
             user = User.query.filter_by(github_id=github_id).first()
@@ -83,41 +83,41 @@ def create_app(config):
 
         user.github_token = token
         user.github_id = github_id
-        user.name = user_response['login']
+        user.name = user_response["login"]
         g.user = user
 
         emails = user.get_emails_from_github()
-        user.email = [e['email'] for e in emails if e['primary']][0]
+        user.email = [e["email"] for e in emails if e["primary"]][0]
         db.session.commit()
-        session['user_id'] = user.id
+        session["user_id"] = user.id
 
         if len(emails) > 1:
-            return redirect(url_for('select_email'))
+            return redirect(url_for("select_email"))
         else:
-            return redirect(url_for('get_repos'))
+            return redirect(url_for("get_repos"))
 
-    @app.route('/login')
+    @app.route("/login")
     def login():
-        if g.user and session.get('user_id'):
-            return redirect(url_for('index'))
+        if g.user and session.get("user_id"):
+            return redirect(url_for("index"))
 
-        if request.args.get('private') == 'True':
-            scope = 'user:email,repo'
+        if request.args.get("private") == "True":
+            scope = "user:email,repo"
         else:
-            scope = 'user:email'
+            scope = "user:email"
 
         return github.authorize(scope=scope)
 
-    @app.route('/logout')
+    @app.route("/logout")
     def logout():
-        session.pop('user_id', None)
-        return redirect(url_for('index'))
+        session.pop("user_id", None)
+        return redirect(url_for("index"))
 
     @app.errorhandler(GitHubError)
     def handle_github_error(error):
         if error.response.status_code == 401:
-            session.pop('user_id', None)
-            return render_template('github-401.html')
+            session.pop("user_id", None)
+            return render_template("github-401.html")
         else:
             return "Github returned: %s" % error
 

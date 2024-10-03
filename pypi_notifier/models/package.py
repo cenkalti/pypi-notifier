@@ -1,19 +1,20 @@
 import logging
 import xmlrpc.client
 from datetime import datetime, timedelta
+
 from sqlalchemy import or_
 from sqlalchemy.ext.associationproxy import association_proxy
-from pypi_notifier.extensions import db, cache
-from pypi_notifier.models.util import commit_or_rollback
 
+from pypi_notifier.extensions import cache, db
+from pypi_notifier.models.util import commit_or_rollback
 
 logger = logging.getLogger(__name__)
 
-pypi = xmlrpc.client.ServerProxy('https://pypi.python.org/pypi')
+pypi = xmlrpc.client.ServerProxy("https://pypi.python.org/pypi")
 
 
 class Package(db.Model):
-    __tablename__ = 'packages'
+    __tablename__ = "packages"
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200), unique=True)
@@ -21,7 +22,7 @@ class Package(db.Model):
     updated_at = db.Column(db.DateTime)
     last_check = db.Column(db.DateTime)
 
-    repos = association_proxy('requirements', 'repo')
+    repos = association_proxy("requirements", "repo")
 
     def __init__(self, name):
         self.name = name.lower()
@@ -50,7 +51,7 @@ class Package(db.Model):
         logger.info("Number of packages processed: %s", total)
 
     @classmethod
-    @cache.cached(timeout=3600, key_prefix='all_packages')
+    @cache.cached(timeout=3600, key_prefix="all_packages")
     def get_all_names(cls):
         packages = pypi.list_packages()
         return {name.lower(): name for name in packages if name}

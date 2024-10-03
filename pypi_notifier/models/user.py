@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 
 class User(db.Model):
-    __tablename__ = 'users'
+    __tablename__ = "users"
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200))
@@ -20,7 +20,7 @@ class User(db.Model):
     github_token = db.Column(db.String(40), unique=True)
     email_sent_at = db.Column(db.DateTime)
 
-    repos = db.relationship('Repo', backref='user', cascade="all, delete-orphan")
+    repos = db.relationship("Repo", backref="user", cascade="all, delete-orphan")
 
     def __init__(self, github_token):
         self.github_token = github_token
@@ -65,29 +65,30 @@ class User(db.Model):
     def send_email(self):
         outdateds = self.get_outdated_requirements()
         if outdateds:
-            html = render_template('email.html', reqs=outdateds)
+            html = render_template("email.html", reqs=outdateds)
             message = pystmark.Message(
-                sender='no-reply@pypi-notifier.org',
+                sender="no-reply@pypi-notifier.org",
                 to=self.email,
                 subject="There are updated packages in PyPI",
-                html=html)
-            response = pystmark.send(message, current_app.config['POSTMARK_APIKEY'])
+                html=html,
+            )
+            response = pystmark.send(message, current_app.config["POSTMARK_APIKEY"])
             response.raise_for_status()
         else:
             logger.info("No outdated requirement.")
 
     def get_emails_from_github(self):
-        params = {'access_token': self.github_token}
-        headers = {'Accept': 'application/vnd.github.v3'}
-        emails = github.get('user/emails', params=params, headers=headers)
-        return [e for e in emails if e['verified']]
+        params = {"access_token": self.github_token}
+        headers = {"Accept": "application/vnd.github.v3"}
+        emails = github.get("user/emails", params=params, headers=headers)
+        return [e for e in emails if e["verified"]]
 
     def get_repos_from_github(self):
         all_repos = []
         page = 1
         while True:
-            params = {'per_page': '100', 'page': str(page)}
-            repos = github.get('user/repos', params=params)
+            params = {"per_page": "100", "page": str(page)}
+            repos = github.get("user/repos", params=params)
             if not repos:
                 break
 

@@ -6,7 +6,7 @@ import traceback
 from pypi_notifier import models
 from pypi_notifier.app import create_app
 
-app = create_app(os.environ['PYPI_NOTIFIER_CONFIG'])
+app = create_app(os.environ["PYPI_NOTIFIER_CONFIG"])
 
 
 def update_repos():
@@ -25,7 +25,7 @@ def send_emails():
 
 
 def handler(signum, stack):
-    print('Alarm: ', time.ctime())
+    print("Alarm: ", time.ctime())
     traceback.print_stack()
 
 

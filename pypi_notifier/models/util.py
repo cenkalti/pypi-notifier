@@ -34,4 +34,4 @@ def commit_or_rollback():
         db.session.commit()
     except Exception:
         db.session.rollback()
-        logger.error(''.join(traceback.format_exc()))
+        logger.error("".join(traceback.format_exc()))

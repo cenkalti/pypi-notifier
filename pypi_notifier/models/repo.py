@@ -26,10 +26,8 @@ class InvalidToken(Exception):
 
 
 class Repo(db.Model):
-    __tablename__ = 'repos'
-    __table_args__ = (
-        UniqueConstraint('user_id', 'github_id'),
-    )
+    __tablename__ = "repos"
+    __table_args__ = (UniqueConstraint("user_id", "github_id"),)
 
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey(User.id))
@@ -39,7 +37,7 @@ class Repo(db.Model):
     last_check = db.Column(db.DateTime)
     last_modified = db.Column(db.String(40))
 
-    packages = association_proxy('requirements', 'package')
+    packages = association_proxy("requirements", "package")
 
     def __init__(self, github_id, user):
         self.github_id = github_id
@@ -101,7 +99,7 @@ class Repo(db.Model):
             if specs:
                 # There must be '==' operator in specs.
                 operators = [s[0] for s in specs]
-                if '==' in operators:
+                if "==" in operators:
                     package_name = package_name.lower()
                     # If the project is not registered on PyPI,
                     # we are not adding it.
@@ -116,15 +114,18 @@ class Repo(db.Model):
 
     def add_new_requirement(self, name, specs):
         from pypi_notifier.models.requirement import Requirement
+
         package = db.session.query(Package).filter(Package.name == name).first()
         if not package:
             package = Package(name=name)
             db.session.add(package)
             db.session.flush([package])
 
-        requirement = db.session.query(Requirement).filter(
-                Requirement.repo_id == self.id,
-                Requirement.package_id == package.id).first()
+        requirement = (
+            db.session.query(Requirement)
+            .filter(Requirement.repo_id == self.id, Requirement.package_id == package.id)
+            .first()
+        )
         if not requirement:
             requirement = Requirement(repo=self, package=package)
 
@@ -142,23 +143,23 @@ class Repo(db.Model):
 
     def fetch_requirements(self, force=False):
         logger.info("Fetching requirements of repo: %s", self)
-        requirements_path = self.requirements_path or 'requirements.txt'
-        path = 'repos/%s/contents/%s' % (self.name, requirements_path.lstrip('/'))
+        requirements_path = self.requirements_path or "requirements.txt"
+        path = "repos/%s/contents/%s" % (self.name, requirements_path.lstrip("/"))
         headers = None
         if not force and self.last_modified:
-            headers = {'If-Modified-Since': self.last_modified}
+            headers = {"If-Modified-Since": self.last_modified}
 
-        response = github.raw_request('GET', path, headers=headers, access_token=self.user.github_token)
+        response = github.raw_request("GET", path, headers=headers, access_token=self.user.github_token)
         logger.debug("Response: %s", response)
         if response.status_code == 200:
-            self.last_modified = response.headers['Last-Modified']
+            self.last_modified = response.headers["Last-Modified"]
             response = response.json()
             if isinstance(response, list):  # path is directory
                 raise RequirementsNotFound
-            if response['encoding'] != 'base64':
-                raise ValueError("Unknown encoding: %s" % response['encoding'])
+            if response["encoding"] != "base64":
+                raise ValueError("Unknown encoding: %s" % response["encoding"])
 
-            return base64.b64decode(response['content']).decode('utf-8', 'replace')
+            return base64.b64decode(response["content"]).decode("utf-8", "replace")
         elif response.status_code == 304:  # Not modified
             raise RequirementsNotModified
         elif response.status_code == 401:
@@ -182,9 +183,13 @@ def strip_requirements(s):
 
     """
     ignore_lines = (
-        '-e',  # editable
-        '-i', '--index-url',  # other source
-        'git+', 'svn+', 'hg+', 'bzr+',  # vcs
-        '-r',  # include other files (not supported yet) TODO
+        "-e",  # editable
+        "-i",
+        "--index-url",  # other source
+        "git+",
+        "svn+",
+        "hg+",
+        "bzr+",  # vcs
+        "-r",  # include other files (not supported yet) TODO
     )
-    return '\n'.join(l for l in s.splitlines() if not l.strip().startswith(ignore_lines))
+    return "\n".join(l for l in s.splitlines() if not l.strip().startswith(ignore_lines))
