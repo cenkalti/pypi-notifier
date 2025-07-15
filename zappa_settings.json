@@ -4,7 +4,7 @@
         "aws_region": "us-east-1",
         "profile_name": "default",
         "project_name": "pypi-notifier",
-        "runtime": "python3.9",
+        "runtime": "python3.12",
         "certificate_arn": "arn:aws:acm:us-east-1:821523470585:certificate/6e8726c2-e6ad-41fe-9c52-dfc4617f3224",
         "domain": "www.pypi-notifier.org",
         "route53_enabled": false,
